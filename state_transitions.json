@@ -1,0 +1,34 @@
+{
+    "transitions": [
+        {
+            "from": "GDD",
+            "to": "SPEC",
+            "action": "PARSE_COMPLETE"
+        },
+        {
+            "from": "SPEC",
+            "to": "BUILD",
+            "action": "APPROVE_SPEC"
+        },
+        {
+            "from": "BUILD",
+            "to": "QA",
+            "action": "BUILD_COMPLETE"
+        },
+        {
+            "from": "QA",
+            "to": "RELEASE",
+            "action": "QA_PASS"
+        },
+        {
+            "from": "QA",
+            "to": "BUILD",
+            "action": "QA_FAIL"
+        },
+        {
+            "from": "RELEASE",
+            "to": "DONE",
+            "action": "RELEASE_COMPLETE"
+        }
+    ]
+}

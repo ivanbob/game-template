@@ -1,0 +1,74 @@
+{
+    "project": {
+        "id": "cipher-squad",
+        "name": "Cipher Squad",
+        "genre": "Daily Collaborative Logic Puzzle",
+        "platform": "Telegram Mini App",
+        "studio_native": true
+    },
+    "lifecycle": {
+        "current_phase": "SPEC",
+        "last_updated": "2026-02-05T20:20:00+02:00",
+        "progress": 20,
+        "gameplay_implemented": false
+    },
+    "gdd": {
+        "status": "PARSED",
+        "source": ".agent/Cipher Squad — Extended Game Design Document (GDD).md",
+        "parsed_at": "2026-02-05T20:20:00+02:00",
+        "intent_snapshot": "intent_snapshot.md",
+        "verdict": "READY_FOR_SPEC"
+    },
+    "spec": {
+        "status": "DRAFT",
+        "spec_id": null,
+        "version": "0.1",
+        "approved": false,
+        "last_updated": "2026-02-05T20:20:00+02:00"
+    },
+    "build": {
+        "status": "NOT_STARTED",
+        "version": null,
+        "build_id": null,
+        "commit": null,
+        "started_at": null,
+        "completed_at": null
+    },
+    "qa": {
+        "status": "NOT_RUN",
+        "last_run": null,
+        "verdict": null,
+        "audit_id": null,
+        "notes": null,
+        "completed_at": null
+    },
+    "release": {
+        "status": "NONE",
+        "version": null,
+        "build_id": null,
+        "type": null,
+        "notes": null,
+        "completed_at": null
+    },
+    "approvals": {
+        "spec": false,
+        "qa": false,
+        "release": false
+    },
+    "blockers": [],
+    "warnings": [],
+    "history": [
+        {
+            "phase": "GDD",
+            "action": "PROJECT_INIT",
+            "timestamp": "2026-02-05T18:19:00+02:00",
+            "note": "Project reset for Studio-Native bootstrap."
+        },
+        {
+            "phase": "GDD",
+            "action": "PARSE_COMPLETE",
+            "timestamp": "2026-02-05T20:20:00+02:00",
+            "note": "GDD parsed into intent_snapshot.md. Transition to SPEC."
+        }
+    ]
+}

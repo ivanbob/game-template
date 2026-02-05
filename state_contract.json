@@ -1,0 +1,40 @@
+{
+    "lifecycle.current_phase": [
+        "GDD",
+        "SPEC",
+        "BUILD",
+        "QA",
+        "RELEASE",
+        "DONE"
+    ],
+    "gdd.status": [
+        "NOT_PARSED",
+        "PARSED",
+        "BLOCKED"
+    ],
+    "spec.status": [
+        "NOT_CREATED",
+        "DRAFT",
+        "READY_FOR_IMPLEMENTATION",
+        "APPROVED",
+        "BLOCKED"
+    ],
+    "build.status": [
+        "NOT_STARTED",
+        "IN_PROGRESS",
+        "SUCCESS",
+        "FAILED"
+    ],
+    "qa.status": [
+        "NOT_RUN",
+        "PASS",
+        "SOFT_FAIL",
+        "HARD_FAIL"
+    ],
+    "release.status": [
+        "NONE",
+        "READY",
+        "RELEASED",
+        "BLOCKED"
+    ]
+}

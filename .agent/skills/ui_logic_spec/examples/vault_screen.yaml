@@ -1,0 +1,31 @@
+screen_id: daily_vault
+states:
+  - id: idle
+    description: "User is viewing the vault door, no input yet."
+  - id: selecting
+    description: "User is inputting the multi-digit code."
+  - id: resolving
+    description: "System is validating the input."
+  - id: error
+    description: "Input was incorrect; feedback is being displayed."
+interactions:
+  - id: input_digit
+    trigger: "tap_number"
+    from_state: idle
+    to_state: selecting
+  - id: submit_attempt
+    trigger: "tap_confirm"
+    from_state: selecting
+    to_state: resolving
+  - id: handle_wrong
+    trigger: "validation_fail"
+    from_state: resolving
+    to_state: error
+  - id: reset_after_error
+    trigger: "delay_complete"
+    from_state: error
+    to_state: idle
+constraints:
+  max_simultaneous_actions: 1
+  disable_on_error: true
+  time_pressure: true

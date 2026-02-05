@@ -1,7 +1,7 @@
 {
     "studio_version": "1.0",
-    "game_id": "__GAME_ID__",
-    "game_name": "__GAME_NAME__",
+    "game_id": "cipher-squad",
+    "game_name": "Cipher Squad",
     "capabilities": {
         "stats": true,
         "promos": false,

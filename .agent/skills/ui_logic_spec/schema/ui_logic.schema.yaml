@@ -1,0 +1,60 @@
+type: object
+required:
+  - screen_id
+  - states
+  - interactions
+  - constraints
+
+properties:
+  screen_id:
+    type: string
+    description: "Unique identifier for the UI screen."
+
+  states:
+    type: array
+    description: "List of possible states for this screen."
+    minItems: 1
+    items:
+      type: object
+      required:
+        - id
+        - description
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+
+  interactions:
+    type: array
+    description: "List of possible interactions/transitions."
+    items:
+      type: object
+      required:
+        - id
+        - trigger
+        - from_state
+        - to_state
+      properties:
+        id:
+          type: string
+        trigger:
+          type: string
+        from_state:
+          type: string
+        to_state:
+          type: string
+
+  constraints:
+    type: object
+    description: "Logical constraints for the UI."
+    required:
+      - max_simultaneous_actions
+    properties:
+      max_simultaneous_actions:
+        type: integer
+        minimum: 1
+      disable_on_error:
+        type: boolean
+      time_pressure:
+        type: boolean
