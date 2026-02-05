@@ -1,4 +1,2 @@
-export const gameConfig = {
-    title: 'Game Template',
-    version: '1.0.0'
-};
+export const GAME_ID = "__GAME_ID__";
+export const GAME_NAME = "__GAME_NAME__";

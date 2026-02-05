@@ -1,3 +1,6 @@
-name = "game-template"
+name = "__GAME_ID__"
 main = "src/index.js"
 compatibility_date = "2024-01-01"
+
+[vars]
+# Studio vars injected at deploy time

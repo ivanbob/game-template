@@ -1,1 +1,14 @@
-{}
+{
+    "studio_version": "1.0",
+    "game_id": "__GAME_ID__",
+    "game_name": "__GAME_NAME__",
+    "capabilities": {
+        "stats": true,
+        "promos": false,
+        "notifications": false
+    },
+    "required_env": [
+        "STUDIO_CORE_URL",
+        "STUDIO_STATS_KEY"
+    ]
+}
