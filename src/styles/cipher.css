@@ -1,0 +1,169 @@
+/* Cipher Squad - Soft Launch Theme */
+
+:root {
+  --bg-color: #0d1117;
+  --text-main: #c9d1d9;
+  --text-dim: #8b949e;
+  --border-dim: #30363d;
+  
+  --color-open: #3fb950;    /* Green */
+  --color-claimed: #d29922; /* Amber */
+  --color-locked: #f85149;  /* Red */
+  --color-solved: #58a6ff;  /* Blue */
+  
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+}
+
+.cipher-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.game-header h1 {
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-solved);
+  border-bottom: 2px solid var(--border-dim);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.status-panel {
+  background: #161b22;
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.status-panel p {
+  margin: 5px 0;
+}
+
+/* Vault Grid */
+.vault-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Tile Card */
+.tile-card {
+  aspect-ratio: 1;
+  background: #161b22;
+  border: 1px solid var(--border-dim);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tile-id {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  position: absolute;
+  top: 5px;
+  left: 8px;
+}
+
+.tile-status {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* States */
+.tile-card.state-open {
+  border-color: var(--color-open);
+  box-shadow: 0 0 5px rgba(63, 185, 80, 0.2);
+}
+.tile-card.state-open:hover {
+  background: rgba(63, 185, 80, 0.1);
+  cursor: pointer;
+  transform: translateY(-2px);
+}
+
+.tile-card.state-claimed-me {
+  border-color: var(--color-claimed);
+  background: rgba(210, 153, 34, 0.1);
+  box-shadow: 0 0 10px rgba(210, 153, 34, 0.3);
+}
+
+.tile-card.state-claimed-other {
+  border-color: var(--border-dim);
+  background: #0f0f0f;
+  opacity: 0.7;
+}
+
+.tile-card.state-solved {
+  border-color: var(--color-solved);
+  background: rgba(88, 166, 255, 0.1);
+}
+
+/* Actions */
+.tile-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+button {
+  background: transparent;
+  border: 1px solid var(--text-dim);
+  color: var(--text-main);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--border-dim);
+}
+
+button.btn-primary {
+  border-color: var(--color-open);
+  color: var(--color-open);
+}
+button.btn-primary:hover {
+  background: rgba(63, 185, 80, 0.1);
+}
+
+button.btn-action {
+  border-color: var(--color-claimed);
+  color: var(--color-claimed);
+}
+button.btn-action:hover {
+  background: rgba(210, 153, 34, 0.1);
+}
+
+.msg-area {
+  min-height: 24px;
+  color: var(--color-claimed);
+  font-size: 0.85rem;
+  margin-top: 10px;
+}

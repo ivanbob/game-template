@@ -1,0 +1,10 @@
+INSERT OR IGNORE INTO vaults (active_date, status, created_at) VALUES ('2026-02-06', 'OPEN', 1770390000);
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t1', '2026-02-06', 'OPEN', '{"clue":"Alpha"}', '{"val":1}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t2', '2026-02-06', 'OPEN', '{"clue":"Beta"}', '{"val":2}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t3', '2026-02-06', 'OPEN', '{"clue":"Gamma"}', '{"val":3}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t4', '2026-02-06', 'OPEN', '{"clue":"Delta"}', '{"val":4}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t5', '2026-02-06', 'OPEN', '{"clue":"Epsilon"}', '{"val":5}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t6', '2026-02-06', 'OPEN', '{"clue":"Zeta"}', '{"val":6}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t7', '2026-02-06', 'OPEN', '{"clue":"Eta"}', '{"val":7}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t8', '2026-02-06', 'OPEN', '{"clue":"Theta"}', '{"val":8}');
+INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES ('t9', '2026-02-06', 'OPEN', '{"clue":"Iota"}', '{"val":9}');

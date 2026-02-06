@@ -1,6 +1,17 @@
-name = "__GAME_ID__"
-main = "src/index.js"
+name = "cipher-squad"
+main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
 [vars]
 # Studio vars injected at deploy time
+
+STUDIO_CORE_URL = "https://studio-core.jikoentcompany.workers.dev"
+
+[[d1_databases]]
+binding = "cipher_squad_db"
+database_name = "cipher-squad-db"
+database_id = "ed3e6930-0bfe-4be9-8a63-d9c0100b5fd4"
+
+[triggers]
+crons = ["0 0 * * *"] # Every day at 00:00 UTC
+
