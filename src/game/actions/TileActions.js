@@ -14,7 +14,7 @@ import { puzzleEngine } from '../logic/PuzzleEngine';
 // CONFIG: Feature Flag for V1 Integration
 const USE_REMOTE_API = true;
 // Hardcoded Worker URL for Soft Launch
-const API_BASE = 'https://cipher-squad.jikoentcompany.workers.dev/api/game/vault';
+const API_BASE = 'https://cipher-squad-worker.jikoentcompany.workers.dev/api/game/vault';
 
 function response(success, error = null, data = null) {
     return { success, error, data };
@@ -33,7 +33,9 @@ async function callApi(endpoint, method, body) {
     if (telegram?.initData) {
         authHeader = `tma ${telegram.initData}`;
     } else {
-        console.warn('[TileActions] Telegram WebApp not detected. API calls may fail 401.');
+        console.warn('[TileActions] Telegram WebApp not detected. Using Dev Mock Auth.');
+        // Fallback for Browser Testing
+        authHeader = `mock dev_user_local`;
     }
 
     try {
@@ -51,7 +53,9 @@ async function callApi(endpoint, method, body) {
             console.error(`[TileActions] API Error ${res.status}:`, text);
             return { success: false, error: `API_ERROR_${res.status}: ${text}` };
         }
-        return { success: true, data: await res.json() };
+        const validRes = await res.json();
+        console.log(`[TileActions] API Success ${endpoint}:`, validRes);
+        return { success: true, data: validRes };
     } catch (e) {
         console.error("API Call Failed", e);
         return { success: false, error: "NETWORK_ERROR" };
@@ -171,6 +175,7 @@ export async function solveTile(tileId, solutionPayload) {
     });
 
     // Server Call
+    // Payload is now { tileId, solution: [[...], ...] }
     const apiRes = await callApi('/solve', 'POST', { tileId, solution: solutionPayload });
     if (!apiRes.success) {
         // Rollback (Revert to Claimed)
@@ -193,7 +198,8 @@ export async function solveTile(tileId, solutionPayload) {
 export async function fetchVault() {
     console.log('[TileActions] Fetching Vault...');
     // endpoint is empty because API_BASE is /api/game/vault
-    const res = await callApi('', 'GET');
+    // Add cache-bust to force fresh read
+    const res = await callApi(`?t=${Date.now()}`, 'GET');
     if (res.success && res.data) {
         // Sync to GameState
         gameState.syncVault(res.data);

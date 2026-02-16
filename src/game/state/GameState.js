@@ -143,7 +143,13 @@ class GameStateManager {
     // --- UI Spec Actions ---
 
     selectTile(tileId) {
-        if (this.currentState !== GAME_STATES.VAULT_ACTIVE) return;
+        // Allow re-selection or switching while focused (Pivot)
+        if (this.currentState !== GAME_STATES.VAULT_ACTIVE &&
+            this.currentState !== GAME_STATES.TILE_FOCUSED &&
+            this.currentState !== GAME_STATES.PUZZLE_ACTIVE) {
+            console.warn(`[GameState] Cannot select tile in state ${this.currentState}`);
+            return;
+        }
         this.selectedTileId = tileId;
         this.transitionTo(GAME_STATES.TILE_FOCUSED);
     }
@@ -162,8 +168,9 @@ class GameStateManager {
     endSubmit(success) {
         this.isSubmitting = false;
         if (success) {
-            this.selectedTileId = null; // Auto-close on success
-            this.transitionTo(GAME_STATES.VAULT_ACTIVE);
+            // SPEC: Stay on tile to allow solving
+            // this.selectedTileId = null; 
+            this.transitionTo(GAME_STATES.TILE_FOCUSED);
         } else {
             // Error handling usually goes to ERROR_FEEDBACK via setError
         }

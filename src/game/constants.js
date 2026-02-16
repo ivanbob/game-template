@@ -10,6 +10,7 @@ export const GAME_STATES = {
     LOBBY: 'LOBBY',                 // Waiting / Post-Game
     VAULT_ACTIVE: 'VAULT_ACTIVE',   // Main Grid View
     TILE_FOCUSED: 'TILE_FOCUSED',   // Modal/Details View
+    PUZZLE_ACTIVE: 'PUZZLE_ACTIVE', // Active Solving (Server State)
     ACTION_SUBMITTING: 'ACTION_SUBMITTING', // Async Transaction
     ERROR_FEEDBACK: 'ERROR_FEEDBACK' // Transient Error
 };

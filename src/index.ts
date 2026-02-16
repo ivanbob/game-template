@@ -129,9 +129,13 @@ class VaultRepository {
     }
 
     async seedTiles(dayId: string, tiles: any[]) {
-        const stmt = this.db.prepare('INSERT OR IGNORE INTO tiles (id, vault_id, status, data, solution) VALUES (?, ?, ?, ?, ?)');
+        const stmt = this.db.prepare('INSERT OR REPLACE INTO tiles (id, vault_id, status, data, solution) VALUES (?, ?, ?, ?, ?)');
         const batch = tiles.map(t => stmt.bind(t.id, dayId, 'OPEN', JSON.stringify(t.data), JSON.stringify(t.solution)));
         await this.db.batch(batch);
+    }
+
+    async wipeVault(dayId: string) {
+        await this.db.prepare('DELETE FROM tiles WHERE vault_id = ?').bind(dayId).run();
     }
 }
 
@@ -154,6 +158,11 @@ async function handleGameRequest(request: Request, env: any): Promise<Response> 
             const user = extractUserFromInitData(initData);
             if (user) userId = String(user.id);
         }
+    } else if (authHeader && authHeader.startsWith('mock ')) {
+        // DEV AUTH: Allow mock users for browser testing
+        const mockId = authHeader.substring(5);
+        if (mockId) userId = mockId;
+        console.log('[Auth] Using Mock User:', userId);
     }
 
     const repo = new VaultRepository(env.cipher_squad_db);
@@ -163,8 +172,22 @@ async function handleGameRequest(request: Request, env: any): Promise<Response> 
     // 2. Route
     if (isGet && path === `${API_PREFIX}`) {
         const today = new Date().toISOString().split('T')[0];
-        const vault = await repo.getVault(today);
-        return Response.json(vault); // Public Read
+        let vault = await repo.getVault(today);
+        const debugInfo: any = { initial_count: vault.grid.length };
+
+        // Lazy Seed: Ensure data exists for today
+        if (!vault.grid || vault.grid.length === 0) {
+            console.log('[LazySeed] Vault empty, seeding now...');
+            await seedTodayVault(env);
+            vault = await repo.getVault(today);
+            debugInfo.seeded = true;
+            debugInfo.post_seed_count = vault.grid.length;
+        }
+
+        const response = Response.json({ ...vault, _debug: debugInfo });
+        response.headers.set('Cache-Control', 'no-store, max-age=0');
+        response.headers.set('X-Worker-Version', 'v2.2-debug');
+        return response;
     }
 
     if (!userId) return new Response('Unauthorized', { status: 401 });
@@ -219,25 +242,15 @@ async function handleSeed(req: Request, env: any) {
     const repo = new VaultRepository(env.cipher_squad_db);
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // 1. Create Vault
-    await repo.ensureVault(date);
+    // 1. Wipe clean to prevent ID collisions (e.g. t1 vs 2026-02-07_t1)
+    await repo.wipeVault(date);
 
-    // 2. Generate Mock Data (3x3)
-    const tiles = [];
-    for (let i = 1; i <= 9; i++) {
-        tiles.push({
-            id: `t${i}`,
-            data: { clue: `Clue for tile ${i}` },
-            solution: { val: i } // Simple numeric match for V1
-        });
-    }
-
-    // 3. Seed
-    await repo.seedTiles(date, tiles);
+    // 2. Run standard seeding logic
+    await seedTodayVault(env);
 
     return Response.json({
         success: true,
-        message: `Seeded vault for ${date} with ${tiles.length} tiles`
+        message: `Vault for ${date} has been wiped and reseeded with Master Image.`
     });
 }
 
@@ -316,16 +329,53 @@ async function seedTodayVault(env: any) {
     // Idempotent Seeding
     await repo.ensureVault(date);
 
-    const tiles = [];
-    for (let i = 1; i <= 9; i++) {
-        tiles.push({
-            id: `t${i}`,
-            data: { clue: `Daily Clue ${i}` },
-            solution: { val: i }
-        });
+    // 1. Generate Master Image (15x15)
+    // Simple "Space Invader" Pattern or similar symmetry
+    const masterImage = Array(15).fill(0).map(() => Array(15).fill(0));
+
+    // Draw a pattern (e.g. Big X + Border)
+    for (let r = 0; r < 15; r++) {
+        for (let c = 0; c < 15; c++) {
+            // Border
+            if (r === 0 || r === 14 || c === 0 || c === 14) masterImage[r][c] = 1;
+            // X
+            if (r === c || r === 14 - c) masterImage[r][c] = 1;
+            // Center Box
+            if (r >= 5 && r <= 9 && c >= 5 && c <= 9) masterImage[r][c] = 1;
+        }
     }
+
+    // 2. Slice into 3x3 Grid of 5x5 Tiles
+    const tiles = [];
+    let tileIndex = 1;
+
+    for (let rowChunk = 0; rowChunk < 3; rowChunk++) {
+        for (let colChunk = 0; colChunk < 3; colChunk++) {
+            const uniqueId = `${date}_t${tileIndex}`;
+
+            // Extract 5x5 Slice
+            const slice = Array(5).fill(0).map((_, r) =>
+                Array(5).fill(0).map((_, c) =>
+                    masterImage[rowChunk * 5 + r][colChunk * 5 + c]
+                )
+            );
+
+            // Create Tile Data (Include solution for Debug/V1)
+            tiles.push({
+                id: uniqueId,
+                data: {
+                    clue: `Sector ${rowChunk},${colChunk}`,
+                    solutionGrid: slice // EXPOSED FOR FRONTEND CLUE GEN & DEBUG
+                },
+                solution: { solutionGrid: slice } // Secure Copy (unused by frontend for now)
+            });
+
+            tileIndex++;
+        }
+    }
+
     await repo.seedTiles(date, tiles);
-    console.log(`[Scheduled] Seeded vault for ${date}`);
+    console.log(`[Scheduled] Seeded vault for ${date} with Master Image`);
 }
 
 export default {

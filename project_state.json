@@ -7,10 +7,10 @@
         "studio_native": true
     },
     "lifecycle": {
-        "current_phase": "QA",
-        "last_updated": "2026-02-06T23:20:00+02:00",
-        "progress": 90,
-        "gameplay_implemented": true
+        "current_phase": "BETA",
+        "last_updated": "2026-02-06T23:55:00+02:00",
+        "progress": 20,
+        "notes": "Entering Phase 2: Gameplay Mechanics"
     },
     "gdd": {
         "status": "PARSED",
@@ -21,48 +21,52 @@
     },
     "spec": {
         "status": "APPROVED",
-        "spec_id": "IMP_PLAN_V1",
-        "version": "1.1",
+        "spec_id": "IMP_PLAN_V2",
+        "version": "2.0",
         "approved": true,
-        "last_updated": "2026-02-06T22:00:00+02:00"
+        "last_updated": "2026-02-06T23:40:00+02:00"
     },
     "build": {
         "status": "SUCCESS",
-        "version": "1.1.0",
-        "build_id": "b_v1.1_rc",
-        "commit": null,
-        "started_at": "2026-02-06T23:15:00+02:00",
-        "completed_at": "2026-02-06T23:20:00+02:00"
+        "version": "2.0.0-beta.1",
+        "build_id": "b_v2.0.0_beta1",
+        "commit": "HEAD",
+        "started_at": "2026-02-06T23:50:00+02:00",
+        "completed_at": "2026-02-06T23:55:00+02:00"
     },
     "qa": {
-        "status": "VERIFIED",
-        "last_run": "2026-02-06T23:10:00+02:00",
-        "verdict": "PASS",
-        "audit_id": "qa_v1.1_audit",
-        "notes": "Spec Enforced. Identity Sync Fixed. Expired Locks Fixed.",
-        "completed_at": "2026-02-06T23:17:00+02:00"
+        "status": "PENDING_VERIFICATION",
+        "last_run": null,
+        "verdict": "UNKNOWN",
+        "notes": "Pending Nonogram UX verification."
     },
     "release": {
-        "status": "NONE",
-        "version": null,
-        "build_id": null,
-        "type": null,
-        "notes": null,
-        "completed_at": null
+        "status": "BETA",
+        "version": "2.0.0-beta.1",
+        "build_id": "b_v2.0.0_beta1",
+        "type": "FEATURE",
+        "notes": "Added Nonogram Gameplay (10x10 Grid).",
+        "completed_at": "2026-02-06T23:55:00+02:00"
     },
     "approvals": {
         "spec": true,
-        "qa": true,
+        "qa": false,
         "release": false
     },
     "blockers": [],
     "warnings": [],
     "history": [
         {
-            "phase": "QA",
-            "action": "VERIFIED",
-            "timestamp": "2026-02-06T23:17:00+02:00",
-            "note": "V1.1 QA Passed. Core Loop and Backend Fixes Verified."
+            "phase": "RELEASE",
+            "action": "RELEASE_COMPLETE",
+            "timestamp": "2026-02-06T23:45:00+02:00",
+            "note": "Released v1.1.1. UX Fix."
+        },
+        {
+            "phase": "BUILD",
+            "action": "FEATURE_DEPLOY",
+            "timestamp": "2026-02-06T23:55:00+02:00",
+            "note": "Deployed Nonogram Mechanics (Beta)."
         }
     ]
 }

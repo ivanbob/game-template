@@ -3,6 +3,7 @@ import { gameState } from '../game/state/GameState';
 import { loopController } from '../game/core/LoopController';
 import VaultGrid from './VaultGrid';
 import GameControls from './GameControls';
+import { fetchVault } from '../game/actions/TileActions';
 
 import TileDetailsModal from './TileDetailsModal';
 import '../styles/cipher.css';
@@ -19,11 +20,13 @@ const CipherGame = () => {
     const [lastTick, setLastTick] = useState(Date.now());
     const [feedback, setFeedback] = useState('');
     const [selectedTile, setSelectedTile] = useState(null);
+    const [isMinimized, setIsMinimized] = useState(false);
 
     // 1. Initialize Game on Mount
     useEffect(() => {
         // REAL IDENTITY SYNC
-        let userCtx = { id: 'dev_local_' + Math.floor(Math.random() * 10000) };
+        // Use stable 'dev_user_local' to match TileActions mock auth
+        let userCtx = { id: 'dev_user_local' };
 
         // Try Telegram Metadata
         const tg = window.Telegram?.WebApp;
@@ -40,8 +43,14 @@ const CipherGame = () => {
         loopController.initGame(userCtx);
 
         // Fetch Data
-        import('../game/actions/TileActions').then(({ fetchVault }) => {
-            fetchVault();
+        fetchVault().then((res) => {
+            console.log('[CipherGame] Initial Vault Scan Complete', res);
+            if (!res || !res.success) {
+                setFeedback('FAILED TO LOAD VAULT DATA');
+            }
+        }).catch(err => {
+            console.error('[CipherGame] Vault Fetch Failed:', err);
+            setFeedback('CONNECTION ERROR: RETRYING...');
         });
 
         // Force initial render
@@ -57,23 +66,39 @@ const CipherGame = () => {
 
             // Sync Selection
             const selId = gameState.selectedTileId;
+
+            // Auto-Select Logic (Unless Minimized)
+            if (currentState === 'PUZZLE_ACTIVE' && !selId && !isMinimized) {
+                const ownerId = gameState.currentUser?.id;
+                const lockedTile = gameState.vault.findActiveLockForUser(ownerId);
+                if (lockedTile) {
+                    // Auto-select
+                    gameState.selectTile(lockedTile.id);
+                }
+            }
+
             if (selId) {
                 const tile = gameState.vault.getTile(selId);
-                setSelectedTile(tile ? { ...tile } : null); // Copy to force re-render
+                setSelectedTile(tile ? { ...tile } : null);
+                // If we have a selection, we are not minimized
+                if (selId && isMinimized) setIsMinimized(false);
             } else {
                 setSelectedTile(null);
             }
 
             setLastTick(now);
-        }, 100); // Faster polling for UI responsiveness
+        }, 100);
 
         return () => clearInterval(intervalId);
-    }, []);
+    }, [isMinimized, currentState]); // Added Dependencies
 
     const handleFeedback = (msg) => {
         setFeedback(msg);
         setTimeout(() => setFeedback(''), 3000);
     };
+
+    // DEBUG: Only show for local dev or specific users
+    const showDebug = true; // For Soft Launch/Dev
 
     return (
         <div className="cipher-container">
@@ -87,7 +112,7 @@ const CipherGame = () => {
                 <div className="msg-area">{feedback}</div>
             </div>
 
-            {/* <GameControls /> (Hidden for Soft Launch) */}
+            {showDebug && <GameControls onFeedback={handleFeedback} />}
 
             <VaultGrid onFeedback={handleFeedback} />
 
@@ -95,13 +120,22 @@ const CipherGame = () => {
             {selectedTile && (
                 <TileDetailsModal
                     tile={selectedTile}
-                    onClose={() => gameState.clearSelection()}
+                    onClose={() => {
+                        // If we own it, just minimize. If just viewing, clear.
+                        const isOwner = selectedTile.claimedBy === gameState.currentUser?.id;
+                        if (isOwner) {
+                            setIsMinimized(true);
+                            gameState.clearSelection();
+                        } else {
+                            gameState.clearSelection();
+                        }
+                    }}
                     onFeedback={handleFeedback}
                 />
             )}
 
             <footer style={{ marginTop: '40px', fontSize: '0.7rem', color: '#444' }}>
-                v1.1.0
+                v1.1.1
             </footer>
         </div>
     );
