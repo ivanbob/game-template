@@ -6,6 +6,7 @@
  */
 
 import { GAME_STATES, TILE_STATUS } from '../constants';
+import { BOOTCAMP_CONFIG } from '../config/bootcampConfig';
 
 /**
  * In-memory store for the current Mosaic Grid status.
@@ -97,6 +98,7 @@ class GameStateManager {
         this.selectedTileId = null;
         this.isSubmitting = false;
         this.lastError = null;
+        this.isBootcampMode = false;
     }
 
     /**
@@ -109,6 +111,7 @@ class GameStateManager {
             return;
         }
         this.currentUser = userContext;
+        this.isBootcampMode = false; // Reset by default
         console.log('[GameState] Initialized with user:', userContext.id);
     }
 
@@ -117,6 +120,12 @@ class GameStateManager {
      * @param {Object} vaultData - JSON payload from BFF
      */
     syncVault(vaultData) {
+        // BOOTCAMP SAFETY: Ignore server updates if we are in Bootcamp
+        if (this.isBootcampMode) {
+            console.log('[GameState] Ignoring server sync (Bootcamp Mode Active)');
+            return;
+        }
+
         this.vault.load(vaultData);
 
         // Auto-transition logic check
@@ -140,13 +149,25 @@ class GameStateManager {
         return this.currentState;
     }
 
+    /**
+     * Initializes Bootcamp Mode.
+     * Loads static config and sets state.
+     */
+    initBootcamp() {
+        console.log('[GameState] Initializing Bootcamp Mode');
+        this.isBootcampMode = true;
+        this.vault.load(BOOTCAMP_CONFIG);
+        this.transitionTo(GAME_STATES.BOOTCAMP);
+    }
+
     // --- UI Spec Actions ---
 
     selectTile(tileId) {
         // Allow re-selection or switching while focused (Pivot)
         if (this.currentState !== GAME_STATES.VAULT_ACTIVE &&
             this.currentState !== GAME_STATES.TILE_FOCUSED &&
-            this.currentState !== GAME_STATES.PUZZLE_ACTIVE) {
+            this.currentState !== GAME_STATES.PUZZLE_ACTIVE &&
+            this.currentState !== GAME_STATES.BOOTCAMP) {
             console.warn(`[GameState] Cannot select tile in state ${this.currentState}`);
             return;
         }
@@ -156,8 +177,8 @@ class GameStateManager {
 
     clearSelection() {
         this.selectedTileId = null;
-        // If we were submitting, we might need to handle that, but typically we go back to Active
-        this.transitionTo(GAME_STATES.VAULT_ACTIVE);
+        // Return to appropriate parent state
+        this.transitionTo(this.isBootcampMode ? GAME_STATES.BOOTCAMP : GAME_STATES.VAULT_ACTIVE);
     }
 
     startSubmit() {
@@ -167,13 +188,8 @@ class GameStateManager {
 
     endSubmit(success) {
         this.isSubmitting = false;
-        if (success) {
-            // SPEC: Stay on tile to allow solving
-            // this.selectedTileId = null; 
-            this.transitionTo(GAME_STATES.TILE_FOCUSED);
-        } else {
-            // Error handling usually goes to ERROR_FEEDBACK via setError
-        }
+        // Always return to focused state to show result or allow retry
+        this.transitionTo(GAME_STATES.TILE_FOCUSED);
     }
 
     setError(msg) {

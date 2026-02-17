@@ -6,13 +6,15 @@
 
 // Global Game State Machine
 export const GAME_STATES = {
-    BOOT: 'BOOT',                   // App Init
-    LOBBY: 'LOBBY',                 // Waiting / Post-Game
-    VAULT_ACTIVE: 'VAULT_ACTIVE',   // Main Grid View
-    TILE_FOCUSED: 'TILE_FOCUSED',   // Modal/Details View
-    PUZZLE_ACTIVE: 'PUZZLE_ACTIVE', // Active Solving (Server State)
-    ACTION_SUBMITTING: 'ACTION_SUBMITTING', // Async Transaction
-    ERROR_FEEDBACK: 'ERROR_FEEDBACK' // Transient Error
+    BOOTCAMP: 'BOOTCAMP', // New User Onboarding
+    BOOTCAMP_COMPLETE: 'BOOTCAMP_COMPLETE', // Graduation
+    LOBBY: 'LOBBY',
+    VAULT_ACTIVE: 'VAULT_ACTIVE',
+    PUZZLE_ACTIVE: 'PUZZLE_ACTIVE',
+    VAULT_COMPLETE: 'VAULT_COMPLETE',
+    ERROR_FEEDBACK: 'ERROR_FEEDBACK',
+    TILE_FOCUSED: 'TILE_FOCUSED',
+    ACTION_SUBMITTING: 'ACTION_SUBMITTING'
 };
 
 // Status of an individual Mosaic Tile

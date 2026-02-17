@@ -6,7 +6,7 @@
  */
 
 import { gameState } from '../state/GameState';
-import { TILE_STATUS } from '../constants';
+import { TILE_STATUS, GAME_STATES } from '../constants';
 
 import { puzzleEngine } from '../logic/PuzzleEngine';
 
@@ -14,7 +14,7 @@ import { puzzleEngine } from '../logic/PuzzleEngine';
 // CONFIG: Feature Flag for V1 Integration
 const USE_REMOTE_API = true;
 // Hardcoded Worker URL for Soft Launch
-const API_BASE = 'https://cipher-squad-worker.jikoentcompany.workers.dev/api/game/vault';
+export const API_BASE = 'https://cipher-squad-worker.jikoentcompany.workers.dev/api/game/vault';
 
 function response(success, error = null, data = null) {
     return { success, error, data };
@@ -93,6 +93,13 @@ export async function claimTile(tileId) {
         lockExpiry: Date.now() + 300000 // 5 mins
     });
 
+    // BOOTCAMP OVERRIDE: Local Only
+    if (gameState.isBootcampMode) {
+        console.log('[TileActions] Bootcamp Claim: Local Success');
+        gameState.endSubmit(true);
+        return response(true);
+    }
+
     // Server Call
     const apiRes = await callApi('/claim', 'POST', { tileId });
     if (!apiRes.success) {
@@ -119,6 +126,11 @@ export async function releaseTile(tileId) {
         claimedBy: null,
         lockExpiry: null
     });
+
+    // BOOTCAMP OVERRIDE: Local Only
+    if (gameState.isBootcampMode) {
+        return response(true);
+    }
 
     // Server Call
     // Fire and forget for release (low risk) or await if strict
@@ -174,6 +186,13 @@ export async function solveTile(tileId, solutionPayload) {
         completedAt: Date.now()
     });
 
+    // BOOTCAMP OVERRIDE: Local Only
+    if (gameState.isBootcampMode) {
+        console.log('[TileActions] Bootcamp Solve: Local Success');
+        gameState.endSubmit(true);
+        return response(true, null, { reward: 'BOOTCAMP_PROGRESSED' });
+    }
+
     // Server Call
     // Payload is now { tileId, solution: [[...], ...] }
     const apiRes = await callApi('/solve', 'POST', { tileId, solution: solutionPayload });
@@ -201,8 +220,70 @@ export async function fetchVault() {
     // Add cache-bust to force fresh read
     const res = await callApi(`?t=${Date.now()}`, 'GET');
     if (res.success && res.data) {
+
+        // POLYFILL: If Main Game tiles are missing solutionGrid (e.g. old vault data),
+        // inject the Space Invader pattern locally so Nonograms work.
+        if (res.data.grid && res.data.grid.length > 0) {
+            const needsPolyfill = res.data.grid.some(t => !t.data?.solutionGrid && !t.id.startsWith('b_'));
+
+            if (needsPolyfill) {
+                console.log('[TileActions] Detected missing solutionGrid. Polyfilling locally...');
+
+                // 1. Generate Master Image (15x15) - deterministic "Space Invader"
+                const masterImage = Array(15).fill(0).map(() => Array(15).fill(0));
+                for (let r = 0; r < 15; r++) {
+                    for (let c = 0; c < 15; c++) {
+                        if (r === 0 || r === 14 || c === 0 || c === 14) masterImage[r][c] = 1; // Border
+                        if (r === c || r === 14 - c) masterImage[r][c] = 1; // X
+                        if (r >= 5 && r <= 9 && c >= 5 && c <= 9) masterImage[r][c] = 1; // Center Box
+                    }
+                }
+
+                // 2. Inject into tiles
+                res.data.grid.forEach(t => {
+                    if (t.id.startsWith('b_')) return; // Skip Bootcamp
+
+                    // Parse Index from ID (YYYY-MM-DD_t1)
+                    const parts = t.id.split('_t');
+                    const idx = parseInt(parts[1]) - 1; // 0-8
+                    if (isNaN(idx)) return;
+
+                    const rowChunk = Math.floor(idx / 3);
+                    const colChunk = idx % 3;
+
+                    // Extract 5x5 Slice
+                    const slice = Array(5).fill(0).map((_, r) =>
+                        Array(5).fill(0).map((_, c) =>
+                            masterImage[rowChunk * 5 + r][colChunk * 5 + c]
+                        )
+                    );
+
+                    if (!t.data) t.data = {};
+                    if (!t.data.solutionGrid) {
+                        t.data.solutionGrid = slice;
+                        t.data.clue = `Sector ${rowChunk},${colChunk}`;
+                    }
+                });
+            }
+        }
+
         // Sync to GameState
         gameState.syncVault(res.data);
     }
     return res;
+}
+
+/**
+ * Fetches the Leaderboard (Top 50)
+ * @returns {Promise<Array>}
+ */
+export async function fetchLeaderboard() {
+    // API_BASE already includes /api/game/vault
+    // we need /api/game/vault/leaderboard
+    const res = await callApi('/leaderboard', 'GET');
+    if (res.success && Array.isArray(res.data)) {
+        return res.data;
+    }
+    console.warn('[TileActions] Leaderboard return was not an array:', res.data);
+    return [];
 }

@@ -7,10 +7,11 @@
         "studio_native": true
     },
     "lifecycle": {
-        "current_phase": "BETA",
-        "last_updated": "2026-02-06T23:55:00+02:00",
+        "current_phase": "BUILD",
+        "active_objective": "Build: Debug Auto-Solve Feature",
+        "last_transition": "2026-02-17T20:20:00+02:00",
         "progress": 20,
-        "notes": "Entering Phase 2: Gameplay Mechanics"
+        "notes": "Features under development. Architecture Map integration."
     },
     "gdd": {
         "status": "PARSED",
@@ -27,33 +28,267 @@
         "last_updated": "2026-02-06T23:40:00+02:00"
     },
     "build": {
-        "status": "SUCCESS",
-        "version": "2.0.0-beta.1",
-        "build_id": "b_v2.0.0_beta1",
+        "status": "IN_PROGRESS",
+        "version": "2.0.0-beta.2",
+        "build_id": "b_v2.0.0_beta2",
         "commit": "HEAD",
-        "started_at": "2026-02-06T23:50:00+02:00",
-        "completed_at": "2026-02-06T23:55:00+02:00"
+        "started_at": "2026-02-16T18:09:19+02:00",
+        "completed_at": null
     },
     "qa": {
-        "status": "PENDING_VERIFICATION",
+        "status": "NOT_RUN",
         "last_run": null,
         "verdict": "UNKNOWN",
-        "notes": "Pending Nonogram UX verification."
+        "notes": null
     },
     "release": {
-        "status": "BETA",
-        "version": "2.0.0-beta.1",
-        "build_id": "b_v2.0.0_beta1",
-        "type": "FEATURE",
-        "notes": "Added Nonogram Gameplay (10x10 Grid).",
-        "completed_at": "2026-02-06T23:55:00+02:00"
+        "status": "NONE",
+        "version": null,
+        "build_id": null,
+        "type": null,
+        "notes": null,
+        "completed_at": null
     },
     "approvals": {
         "spec": true,
         "qa": false,
         "release": false
     },
-    "blockers": [],
+    "issues": [
+        {
+            "id": "BUG-001",
+            "title": "Missing Bootcamp Mode",
+            "description": "The game allows new users to enter the Squad Vault directly without the GDD-mandated 'Bootcamp' (Solo Onboarding) mode. Code contains stubbed references but no implementation.",
+            "status": "OPEN",
+            "priority": "HIGH",
+            "created_at": "2026-02-16T19:38:00+02:00"
+        },
+        {
+            "id": "BUG-002",
+            "title": "Deployment Target Mismatch",
+            "description": "Deployment targeted 'cipher-squad-client' instead of the production 'cipher-squad-web', causing new features to be missing on the live URL.",
+            "status": "RESOLVED",
+            "priority": "CRITICAL",
+            "created_at": "2026-02-16T20:10:00+02:00",
+            "resolved_at": "2026-02-16T20:20:00+02:00"
+        },
+        {
+            "id": "BUG-003",
+            "title": "Runtime Error: require is not defined",
+            "description": "Uncaught ReferenceError: require is not defined in GameState.js (initBootcamp). Likely caused by CommonJS require() usage in Vite (ESM) environment.",
+            "status": "RESOLVED",
+            "priority": "CRITICAL",
+            "created_at": "2026-02-17T08:35:00+02:00",
+            "resolved_at": "2026-02-17T08:45:00+02:00"
+        },
+        {
+            "id": "BUG-004",
+            "title": "Bootcamp UI/Logic Malfunction",
+            "description": "Multiple Issues: 1) Duplicated Debug Controls. 2) Grid shows 9 tiles (3x3) instead of 4 (2x2). 3) Interaction blocked (OPEN does nothing). 4) State race condition on load (Server data overwrites local bootcamp config).",
+            "status": "RESOLVED",
+            "priority": "CRITICAL",
+            "created_at": "2026-02-17T08:40:00+02:00",
+            "resolved_at": "2026-02-17T08:50:00+02:00"
+        },
+        {
+            "id": "BUG-005",
+            "title": "Bootcamp State Exit Failure",
+            "description": "Exiting a tile detail view (clearSelection) or encountering an error forcefully transitions state to VAULT_ACTIVE, incorrectly exiting BOOTCAMP mode. This causes VaultGrid to render Bootcamp tiles (layout breakage) and API calls to fail (bypass skipped).",
+            "status": "RESOLVED",
+            "priority": "CRITICAL",
+            "created_at": "2026-02-17T08:55:00+02:00",
+            "resolved_at": "2026-02-17T08:58:00+02:00"
+        },
+        {
+            "id": "BUG-006",
+            "title": "Master Image Preview Failure",
+            "description": "Clicking 'SHOW MASTER IMAGE' in Debug Controls displays a black square instead of the puzzle solution image. This suggests the image source is missing, invalid, or not defined for the current logic.",
+            "status": "RESOLVED",
+            "priority": "LOW",
+            "created_at": "2026-02-17T09:00:00+02:00",
+            "resolved_at": "2026-02-17T09:05:00+02:00"
+        },
+        {
+            "id": "BUG-007",
+            "title": "Misleading Debug Text & Nonogram Query",
+            "description": "Debug Controls incorrectly state '*Reseed will generate new 15x15 Space Invader Pattern' while in Bootcamp Mode (which is static). User also questions if Nonogram generation is functional.",
+            "status": "RESOLVED",
+            "priority": "LOW",
+            "created_at": "2026-02-17T09:10:00+02:00",
+            "resolved_at": "2026-02-17T09:15:00+02:00"
+        },
+        {
+            "id": "BUG-008",
+            "title": "Stuck in Bootcamp / Nonograms Inaccessible",
+            "description": "User reports Nonograms 'don't work at all' and Master Image doesn't show expected 'Space Invader'. Analysis suggests User is stuck in Bootcamp (static 2x2) because Graduation state is not persisted or handled, correctly preventing access to Main Game generative content.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T09:50:00+02:00",
+            "resolved_at": "2026-02-17T10:00:00+02:00"
+        },
+        {
+            "id": "BUG-009",
+            "title": "Bootcamp Tiles Missing Puzzle Data",
+            "description": "Opening a provided Bootcamp tile (e.g., b_0_0) results in 'Tile Data: undefined' and 'Missing solutionGrid' warnings. This causes the puzzle view to use a fallback mock instead of a real solvable puzzle, blocking progression.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T10:10:00+02:00",
+            "resolved_at": "2026-02-17T10:15:00+02:00"
+        },
+        {
+            "id": "BUG-010",
+            "title": "Bootcamp Visual Reward Mismatch",
+            "description": "User reports disappointment that Bootcamp completion yields no 'Image' and the Master Preview shows numbers instead of Art. The current 2x2 grid does not form a cohesive picture, violating the core game promise of 'solving to reveal an image'.",
+            "status": "RESOLVED",
+            "priority": "MEDIUM",
+            "created_at": "2026-02-17T11:00:00+02:00",
+            "resolved_at": "2026-02-17T11:10:00+02:00"
+        },
+        {
+            "id": "BUG-011",
+            "title": "Bootcamp Completion Missing Master Image",
+            "description": "After solving all Bootcamp tiles, the 'Training Complete' screen appears but does not display the assembled 'Heart' Master Image. User expects to see the final reward before entering the lobby.",
+            "status": "RESOLVED",
+            "priority": "MEDIUM",
+            "created_at": "2026-02-17T11:20:00+02:00",
+            "resolved_at": "2026-02-17T11:30:00+02:00"
+        },
+        {
+            "id": "BUG-012",
+            "title": "Main Game Regression: Missing Puzzle Data & Master Image",
+            "description": "After graduating Bootcamp, Main Game tiles show '?' in Master Preview and Nonograms are non-functional. Caused by 1) GameControls regression defaulting to '?' and 2) Likely missing `solutionGrid` data in the Main Game mock/fetch generation logic.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T11:35:00+02:00",
+            "resolved_at": "2026-02-17T11:45:00+02:00"
+        },
+        {
+            "id": "BUG-013",
+            "title": "Main Game Completion Missing Win Screen",
+            "description": "Upon solving all 9 tiles in the Main Vault, the system transitions to 'VAULT_COMPLETE' (visible in status header), but the UI remains static. No 'Vault Unlocked' modal or Master Image reveal is displayed.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T11:50:00+02:00",
+            "resolved_at": "2026-02-17T12:00:00+02:00"
+        },
+        {
+            "id": "BUG-014",
+            "title": "Crash on Vault Load: tiles is not defined",
+            "description": "User reports specific ReferenceError in console. Cause identified: The `tiles` state declaration was accidentally removed during the previous edit to `VaultGrid.jsx`, causing a crash whenever `tiles` is accessed.",
+            "status": "RESOLVED",
+            "priority": "CRITICAL",
+            "created_at": "2026-02-17T12:05:00+02:00",
+            "resolved_at": "2026-02-17T12:15:00+02:00"
+        },
+        {
+            "id": "BUG-015",
+            "title": "Completion Modal Loop",
+            "description": "After closing the 'Vault Decrypted' modal, it immediately reappears (or reappears on reload). The current 'Close' action triggers a page reload, which re-evaluates the Vault State as 'COMPLETE', acting as if it's a new completion event.",
+            "status": "RESOLVED",
+            "priority": "MEDIUM",
+            "created_at": "2026-02-17T12:20:00+02:00",
+            "resolved_at": "2026-02-17T12:30:00+02:00"
+        },
+        {
+            "id": "BUG-016",
+            "title": "Force Reseed Fails to Reset State",
+            "description": "User reports that clicking 'FORCE RESEED' or 'RELOAD APP' does not reset the 'Solved' status of tiles. Tiles remain solved even after an admin reseed which should wipe the vault.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T12:35:00+02:00",
+            "resolved_at": "2026-02-17T12:45:00+02:00"
+        },
+        {
+            "id": "BUG-017",
+            "title": "Force Reseed API Failure",
+            "description": "User encounters 'Seed Failed' alert. This likely indicates that the Backend Worker is either not deployed or returning an error (e.g. 404 Not Found) for the '/admin/seed' endpoint.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T12:55:00+02:00",
+            "resolved_at": "2026-02-17T13:10:00+02:00"
+        },
+        {
+            "id": "BUG-018",
+            "title": "Force Reseed 401 Unauthorized",
+            "description": "User reports 'Seed Failed' and console shows 401 Unauthorized on '/api/game/vault/admin/seed'. This implies the Worker has an ADMIN_KEY set that does not match the 'dev-key-ignore-for-now' sent by the frontend.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T13:20:00+02:00",
+            "resolved_at": "2026-02-17T13:30:00+02:00"
+        },
+        {
+            "id": "BUG-019",
+            "title": "Persistent 401 on Force Reseed",
+            "description": "Despite explicitly allowing the dev key in the Worker code, the user still receives 401 Unauthorized. This suggests the deployment might not have propagated, or there is a subtle issue with header case-sensitivity or environment variable handling in the Worker.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T13:40:00+02:00",
+            "resolved_at": "2026-02-17T14:45:00+02:00"
+        },
+        {
+            "id": "BUG-020",
+            "title": "Persistent 401 on Reseed (3rd Attempt)",
+            "description": "The 401 error persists. My hardcoded check failed. Possibilities: Header stripping by Cloudflare/Proxy, Case-sensitivity mismatch (though fetch normalizes), or I am editing the wrong file/deploying to wrong target. I need to debug by echoing the received key.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T15:00:00+02:00",
+            "resolved_at": "2026-02-17T16:15:00+02:00"
+        },
+        {
+            "id": "BUG-021",
+            "title": "Frontend Swallows API Error Details",
+            "description": "The Frontend 'GameControls.jsx' throws 'res.statusText' logic, masking the custom error body from the worker. This prevents the user from seeing the 'Received Key' debug info necessary to solve BUG-020/BUG-019.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T15:40:00+02:00",
+            "resolved_at": "2026-02-17T15:55:00+02:00"
+        },
+        {
+            "id": "BUG-022",
+            "title": "Admin Endpoint Blocked by User Auth",
+            "description": "The '/admin/seed' endpoint is unreachable because the Worker enforces user authentication (checking 'userId') BEFORE checking for the Admin Route. Since the Admin request only sends an Admin Key and no User Auth, it falls into the generic 401 trap.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T16:00:00+02:00",
+            "resolved_at": "2026-02-17T16:15:00+02:00"
+        },
+        {
+            "id": "BUG-023",
+            "title": "Master Image Pattern Mismatch",
+            "description": "The 'Force Reseed' function generates a simple box pattern instead of the expected 'Space Invader' pattern described in the UI. The debug image shows a generic X shape with a box, which lacks the visual complexity and 'alien' feel required.",
+            "status": "RESOLVED",
+            "priority": "MEDIUM",
+            "created_at": "2026-02-17T16:20:00+02:00",
+            "resolved_at": "2026-02-17T16:35:00+02:00"
+        },
+        {
+            "id": "BUG-024",
+            "title": "Production Build Failure (MIME Type)",
+            "description": "Production URL loads 'client.jsx' directly as text/jsx, causing browser error. Indicates incorrect deployment of source files instead of built assets (Missing Build Step).",
+            "status": "RESOLVED",
+            "priority": "CRITICAL",
+            "created_at": "2026-02-17T16:40:00+02:00",
+            "resolved_at": "2026-02-17T16:50:00+02:00"
+        },
+        {
+            "id": "BUG-025",
+            "title": "Leaderboard Crash (ReferenceError: useState)",
+            "description": "Clicking 'VIEW LEADERBOARD' crashes the app with 'useState is not defined'. Likely caused by missing React import in Leaderboard.jsx after recent refactoring.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T17:00:00+02:00",
+            "resolved_at": "2026-02-17T17:15:00+02:00"
+        },
+        {
+            "id": "BUG-026",
+            "title": "Leaderboard Render Crash (t.map is not a function)",
+            "description": "Leaderboard crashes with TypeError: map is not a function. Indicates 'scores' state is not an array. API response might be malformed or incorrectly parsed in TileActions/Leaderboard.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T17:25:00+02:00",
+            "resolved_at": "2026-02-17T17:35:00+02:00"
+        }
+    ],
     "warnings": [],
     "history": [
         {

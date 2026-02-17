@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { gameState } from '../game/state/GameState';
 import { loopController } from '../game/core/LoopController';
+import { GAME_STATES } from '../game/constants';
 import VaultGrid from './VaultGrid';
+import BootcampVault from './BootcampVault';
 import GameControls from './GameControls';
 import { fetchVault } from '../game/actions/TileActions';
 
@@ -38,6 +40,11 @@ const CipherGame = () => {
             console.log('[CipherGame] Authenticated as Telegram User:', userCtx.id);
         } else {
             console.warn('[CipherGame] No Telegram Context. Using Mock:', userCtx.id);
+        }
+
+        // Check Local Storage for Graduation
+        if (localStorage.getItem('bootcamp_complete') === 'true') {
+            userCtx.hasCompletedBootcamp = true;
         }
 
         loopController.initGame(userCtx);
@@ -114,7 +121,18 @@ const CipherGame = () => {
 
             {showDebug && <GameControls onFeedback={handleFeedback} />}
 
-            <VaultGrid onFeedback={handleFeedback} />
+            {(gameState.isBootcampMode) ? (
+                <BootcampVault
+                    onFeedback={handleFeedback}
+                    onComplete={() => {
+                        // Handle Graduation
+                        localStorage.setItem('bootcamp_complete', 'true');
+                        window.location.reload();
+                    }}
+                />
+            ) : (
+                <VaultGrid onFeedback={handleFeedback} />
+            )}
 
             {/* Modal Layer */}
             {selectedTile && (

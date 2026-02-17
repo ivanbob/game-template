@@ -27,10 +27,17 @@ class LoopController {
             initialState = GAME_STATES.VAULT_ACTIVE;
         }
 
-        // TODO: Check if user is in Bootcamp (tutorial) via userContext or stats
-        // if (userContext.isNew) initialState = GAME_STATES.BOOTCAMP;
+        // Check if user is in Bootcamp (tutorial)
+        // For V1 MVP: userContext.isNew is the flag
+        if (userContext.isNew || !userContext.hasCompletedBootcamp) {
+            gameState.initBootcamp();
+            initialState = GAME_STATES.BOOTCAMP;
+            console.log(`[LoopController] User is new. Entering BOOTCAMP.`);
+        } else {
+            console.log(`[LoopController] User is experienced. Entering LOBBY.`);
+            gameState.transitionTo(initialState);
+        }
 
-        gameState.transitionTo(initialState);
         console.log(`[LoopController] Game initialized in state: ${initialState}`);
     }
 
@@ -68,6 +75,15 @@ class LoopController {
             if (allSolved && gameState.vault.tiles.size > 0) {
                 gameState.transitionTo(GAME_STATES.VAULT_COMPLETE);
                 return; // Stop processing other transitions
+            }
+        }
+
+        // BOOTCAMP -> BOOTCAMP_COMPLETE
+        if (currentState === GAME_STATES.BOOTCAMP) {
+            const allSolved = Array.from(gameState.vault.tiles.values()).every(t => t.status === TILE_STATUS.SOLVED);
+            if (allSolved && gameState.vault.tiles.size > 0) {
+                gameState.transitionTo(GAME_STATES.BOOTCAMP_COMPLETE);
+                return;
             }
         }
 
