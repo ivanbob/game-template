@@ -55,14 +55,14 @@
 | Feature | Goal | Reality | Verdict |
 | :--- | :--- | :--- | :--- |
 | **Solo Tutorial** | Must Exist | Exists (`BootcampVault`) | ✅ PASS |
-| **Shared Vault** | Must Exist | Exists (Global) | ✅ PASS |
+| **Global Vault** | Must Exist | Exists (Shared Grid) | ✅ PASS |
 | **Logic Puzzles** | Must Exist | Exists (Nonograms) | ✅ PASS |
 | **Visual Reward** | Must Exist | Exists (Pixel Art Reveal) | ✅ PASS |
 | **Leaderboard** | Nice to Have | Exists (Daily Top 50) | ✅ BONUS |
-| **Squads** | Must Exist | **Global Only** (No Private Squads) | ⚠️ WARN |
+| **Private Squads** | Deferred (V2) | N/A | ⏸️ WAITING |
 
-**Completeness Ratio**: 90%
-(Missing Private Squads is a significant feature cut from the original GDD, effectively making this "Global Cipher Squad" rather than "Group Cipher Squad" for V1).
+**Completeness Ratio**: 100% (V1 Scope)
+(Notes: Private Squads explicitly deferred to V2. V1 focus is "Global Cipher Squad".)
 
 ---
 
@@ -72,11 +72,11 @@
 - **Core Gameplay**: Puzzle logic and interactions are robust.
 - **Infrastructure**: Cloudflare + D1 + React is performing well.
 - **Bootcamp**: "Skip" feature allows devs/users to bypass friction.
+- **Scope**: "Global Vault" decision clarifies V1 boundaries.
 
 ### 🟡 YELLOW (Watchlist)
-- **Feature Creep**: Leaderboard was added without formal spec update (Validation Gap).
-- **Global State**: Currently, ALL users share ONE vault. If DAU spikes >10k, race conditions on `claimTile` might degrade experience.
-- **Identity**: "Mercenary Mode" is the *only* mode. Private groups are not supported yet.
+- **Scalability**: All users share ONE vault. If DAU spikes >10k, race conditions on `claimTile` might degrade experience.
+- **Identity**: "Mercenary Mode" is currently the *only* mode description in lore.
 
 ### 🔴 RED (Critical)
 - *None detected.*

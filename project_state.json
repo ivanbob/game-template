@@ -7,11 +7,11 @@
         "studio_native": true
     },
     "lifecycle": {
-        "current_phase": "QA",
-        "active_objective": "QA: Verify Debug Auto-Solve & Bug Fixes",
-        "last_transition": "2026-02-17T21:30:00+02:00",
+        "current_phase": "RELEASE",
+        "active_objective": "RELEASE: V1.2.0 Global Vault Launch",
+        "last_transition": "2026-02-19T21:50:00+02:00",
         "progress": 100,
-        "notes": "Debug Auto-Solve implemented. Critical bugs (027-031) fixed. Deployed to QA."
+        "notes": "Global Vault V1 released. Bootcamp skip enabled. Leaderboard active."
     },
     "gdd": {
         "status": "PARSED",
@@ -28,22 +28,22 @@
         "last_updated": "2026-02-06T23:40:00+02:00"
     },
     "build": {
-        "status": "IN_PROGRESS",
-        "version": "2.0.0-beta.2",
-        "build_id": "b_v2.0.0_beta2",
+        "status": "RELEASED",
+        "version": "1.2.0",
+        "build_id": "r_v1.2.0_global",
         "commit": "HEAD",
         "started_at": "2026-02-16T18:09:19+02:00",
-        "completed_at": null
+        "completed_at": "2026-02-19T21:50:00+02:00"
     },
     "qa": {
-        "status": "NOT_RUN",
-        "last_run": null,
-        "verdict": "UNKNOWN",
-        "notes": null
+        "status": "PASSED",
+        "last_run": "2026-02-19T21:30:00+02:00",
+        "verdict": "PASS",
+        "notes": "Verified by User (Leaderboard, Bootcamp, Vault)."
     },
-    "phase": "MAINTENANCE",
+    "phase": "LIVE_OPS",
     "status": "LIVE",
-    "objective": "Resolve Bug Reports & Optimize Mobile UX",
+    "objective": "Monitor V1 Launch & Gather Metrics",
     "environments": {
         "production": {
             "url": "https://cipher-squad-ui.pages.dev/",

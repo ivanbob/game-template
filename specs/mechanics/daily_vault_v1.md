@@ -1,20 +1,20 @@
 # SPEC METADATA
 Spec ID: MEC-001
-Related Feature: Daily Vault (Soft Launch)
-Status: READY_FOR_IMPLEMENTATION (RETROACTIVE)
-Scope: MVP
+Related Feature: Global Daily Vault (V1 Strategy)
+Status: READY_FOR_IMPLEMENTATION (ACTIVE)
+Scope: V1 Launch
 
 ---
 
 # SYSTEM BOUNDARIES
 **In Scope:**
-- 3x3 Tile Grid (Daily)
+- 3x3 Tile Grid (Global Shared State)
 - Tile Claiming (Locking)
 - Tile Solving (Numeric)
 - Telegram User Authentication (via WebApp initData)
 
 **Out of Scope:**
-- Squad formation (Lobby only)
+- Private Squad formation (Deferred to V2)
 - Complex puzzles (solutions are 1-9)
 - Leaderboards
 - User profiles (persistence beyond ID)
