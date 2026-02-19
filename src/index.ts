@@ -3,6 +3,12 @@
 // CONFIG
 const API_PREFIX = '/api/game/vault';
 
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Admin-Key',
+};
+
 // --- AUTHENTICATION LAYER ---
 
 async function validateTelegramWebAppData(initData: string, botToken: string): Promise<boolean> {
@@ -238,7 +244,13 @@ async function handleGameRequest(request: Request, env: any): Promise<Response> 
     if (isGet && path === `${API_PREFIX}/leaderboard`) {
         const today = new Date().toISOString().split('T')[0];
         const leaderboard = await repo.getLeaderboard(today);
-        return Response.json({ success: true, data: leaderboard });
+        return new Response(JSON.stringify({ success: true, data: leaderboard }), {
+            headers: {
+                ...corsHeaders,
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, max-age=0'
+            }
+        });
     }
 
     return new Response('Not Found', { status: 404 });
@@ -433,26 +445,76 @@ async function seedTodayVault(env: any) {
     console.log(`[Scheduled] Seeded vault for ${date} with Master Image`);
 }
 
+// --- TELEGRAM BOT LOGIC ---
+
+async function handleTelegramWebhook(request: Request, env: any) {
+    try {
+        const update: any = await request.json();
+
+        // Ensure it's a message
+        if (update.message && update.message.text === '/start') {
+            const chatId = update.message.chat.id;
+            const firstName = update.message.from.first_name || 'Agent';
+
+            // Send Welcome Message
+            await sendTelegramMessage(env.TELEGRAM_BOT_TOKEN, chatId,
+                `👋 <b>Welcome, ${firstName}!</b>\n\n` +
+                `You have been recruited for <b>Cipher Squad</b>.\n\n` +
+                `🔎 <b>Mission:</b> Recover the daily Master Image.\n` +
+                `🤝 <b>Collaborate:</b> Work with others to crack the 15x15 vault.\n` +
+                `🏆 <b>Compete:</b> Earn your spot on the leaderboard.\n\n` +
+                `<i>Tap below to access the secure terminal.</i>`,
+                {
+                    inline_keyboard: [[
+                        { text: "🔓 ACCESS VAULT", web_app: { url: "https://cipher-squad-ui.pages.dev/" } }
+                    ]]
+                }
+            );
+        }
+
+        return new Response('OK', { status: 200 });
+    } catch (e) {
+        console.error('[Webhook Error]', e);
+        return new Response('Error', { status: 500 });
+    }
+}
+
+async function sendTelegramMessage(token: string, chatId: number, text: string, replyMarkup: any = null) {
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    const payload: any = {
+        chat_id: chatId,
+        text: text,
+        parse_mode: 'HTML'
+    };
+
+    if (replyMarkup) {
+        payload.reply_markup = replyMarkup;
+    }
+
+    await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+}
+
 export default {
     async fetch(request: Request, env: any, ctx: any): Promise<Response> {
-        // ... (existing fetch logic) ...
         const url = new URL(request.url);
-
-        // CORS Headers
-        const corsHeaders = {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Admin-Key',
-        };
 
         if (request.method === 'OPTIONS') {
             return new Response(null, { headers: corsHeaders });
         }
 
+        // TELEGRAM WEBHOOK ROUTE
+        if (request.method === 'POST' && url.pathname === '/api/telegram/webhook') {
+            return handleTelegramWebhook(request, env);
+        }
+
         if (url.pathname.startsWith('/api/game')) {
             try {
                 const response = await handleGameRequest(request, env);
-                // Append CORS to response
+                // Append CORS
                 const newHeaders = new Headers(response.headers);
                 Object.entries(corsHeaders).forEach(([k, v]) => newHeaders.set(k, v));
                 return new Response(response.body, {

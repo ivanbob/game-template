@@ -13,7 +13,7 @@ const Leaderboard = ({ onClose }) => {
                 setScores(data);
             } catch (err) {
                 console.error(err);
-                setError('Failed to load rankings.');
+                setError(err.message || 'Failed to load rankings.');
             } finally {
                 setLoading(false);
             }

@@ -124,32 +124,24 @@ const TileDetailsModal = ({ tile, onClose, onFeedback }) => {
     // Safety Render
     try {
         return (
-            <div className="modal-backdrop" style={{
-                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                zIndex: 10000
-            }} onClick={onClose}>
-                <div className="modal-content" style={{
-                    backgroundColor: '#111', border: '1px solid #0f0', padding: '15px',
-                    maxWidth: '360px', width: '90%', boxShadow: '0 0 20px rgba(0,255,0,0.2)',
-                    maxHeight: '90vh', overflowY: 'auto', position: 'relative'
-                }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-backdrop" onClick={onClose}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
 
-                    <h2 style={{ marginTop: 0, color: '#0f0', textAlign: 'center' }}>{tile.id}</h2>
-                    <div className="status-badge" style={{ marginBottom: '15px', textAlign: 'center', color: '#888', fontSize: '12px' }}>
-                        {tile.status} {tile.claimedBy ? `by ${tile.claimedBy}` : ''}
-                    </div>
-
-                    <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
-                        <button onClick={() => setShowSolution(!showSolution)} style={{ fontSize: '10px', background: '#333', color: '#fff', border: '1px solid #666', cursor: 'pointer' }}>
-                            {showSolution ? 'HIDE ANSWER' : 'PEEK'}
+                    {/* Compact Header */}
+                    <div className="modal-header-compact">
+                        <div style={{ color: '#0f0', fontWeight: 'bold' }}>{tile.id}</div>
+                        <div style={{ color: '#888', fontSize: '0.8rem' }}>
+                            {tile.status} {tile.claimedBy ? `by ${tile.claimedBy}` : ''}
+                        </div>
+                        <button onClick={() => setShowSolution(!showSolution)} style={{ fontSize: '0.7rem', background: '#333', color: '#fff', border: '1px solid #666', cursor: 'pointer', padding: '2px 5px' }}>
+                            {showSolution ? 'HIDE' : 'PEEK'}
                         </button>
                     </div>
 
-                    {/* Local Feedback Area */}
+                    {/* Local Feedback Area - Only show if active */}
                     {localFeedback && (
                         <div style={{
-                            marginBottom: '10px', padding: '8px', textAlign: 'center',
+                            marginBottom: '5px', padding: '5px', textAlign: 'center', fontSize: '0.8rem',
                             backgroundColor: localFeedback.isError ? 'rgba(255,0,0,0.2)' : 'rgba(0,255,0,0.2)',
                             color: localFeedback.isError ? '#ff4444' : '#0f0',
                             border: `1px solid ${localFeedback.isError ? '#f00' : '#0f0'}`
@@ -158,53 +150,56 @@ const TileDetailsModal = ({ tile, onClose, onFeedback }) => {
                         </div>
                     )}
 
-                    {/* Actions */}
-                    {isSubmitting ? (
-                        <div style={{ color: '#ff0', textAlign: 'center', padding: '20px' }}>TRANSMITTING...</div>
-                    ) : (
-                        <>
-                            {tile.status === 'OPEN' && (
-                                <button className="btn-primary" style={{ width: '100%', padding: '15px', background: '#0f0', color: '#000', fontWeight: 'bold', border: 'none', cursor: 'pointer' }} onClick={handleClaim}>
-                                    CLAIM TILE & START
-                                </button>
-                            )}
+                    {/* Content Area */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        {isSubmitting ? (
+                            <div style={{ color: '#ff0', textAlign: 'center', padding: '20px' }}>TRANSMITTING...</div>
+                        ) : (
+                            <>
+                                {tile.status === 'OPEN' && (
+                                    <button className="btn-primary" style={{ width: '100%', padding: '15px', background: '#0f0', color: '#000', fontWeight: 'bold', border: 'none', cursor: 'pointer' }} onClick={handleClaim}>
+                                        CLAIM TILE & START
+                                    </button>
+                                )}
 
-                            {tile.status === 'CLAIMED' && isOwner && (
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                {tile.status === 'CLAIMED' && isOwner && (
+                                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-                                    <PuzzleGrid
-                                        clues={puzzleData.clues}
-                                        initialGrid={displayGrid}
-                                        onGridChange={showSolution ? () => { } : setGridState}
-                                    />
+                                        <PuzzleGrid
+                                            clues={puzzleData.clues}
+                                            initialGrid={displayGrid}
+                                            onGridChange={showSolution ? () => { } : setGridState}
+                                        />
 
-                                    <div style={{ display: 'flex', gap: '10px', marginTop: '20px', width: '100%' }}>
-                                        <button onClick={handleRelease} style={{ flex: 1, background: 'transparent', border: '1px solid #666', color: '#888', padding: '10px', cursor: 'pointer' }}>
-                                            GIVE UP
-                                        </button>
-                                        <button className="btn-action" onClick={handleSolve} style={{ flex: 2, padding: '10px', background: '#00f', color: '#fff', border: 'none', cursor: 'pointer' }}>
-                                            SUBMIT
-                                        </button>
+                                        {/* Sticky Footer Actions */}
+                                        <div style={{ display: 'flex', gap: '10px', marginTop: '10px', width: '100%' }}>
+                                            <button onClick={handleRelease} style={{ flex: 1, background: 'transparent', border: '1px solid #666', color: '#888', padding: '10px', cursor: 'pointer' }}>
+                                                GIVE UP
+                                            </button>
+                                            <button className="btn-action" onClick={handleSolve} style={{ flex: 2, padding: '10px', background: '#00f', color: '#fff', border: 'none', cursor: 'pointer' }}>
+                                                SUBMIT
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {tile.status === 'CLAIMED' && !isOwner && (
-                                <div style={{ color: '#888', textAlign: 'center', padding: '20px' }}>
-                                    🔒 LOCKED by operative {tile.claimedBy}
-                                </div>
-                            )}
+                                {tile.status === 'CLAIMED' && !isOwner && (
+                                    <div style={{ color: '#888', textAlign: 'center', padding: '20px' }}>
+                                        🔒 LOCKED by operative {tile.claimedBy}
+                                    </div>
+                                )}
 
-                            {tile.status === 'SOLVED' && (
-                                <div style={{ color: '#0ff', textAlign: 'center', padding: '20px' }}>
-                                    ✓ Solved by {tile.completedBy}
-                                </div>
-                            )}
-                        </>
-                    )}
+                                {tile.status === 'SOLVED' && (
+                                    <div style={{ color: '#0ff', textAlign: 'center', padding: '20px' }}>
+                                        ✓ Solved by {tile.completedBy}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
 
-                    <button onClick={onClose} style={{ marginTop: '15px', width: '100%', background: '#222', border: 'none', padding: '10px', color: '#fff', cursor: 'pointer' }}>
-                        {(tile.status === 'CLAIMED' && isOwner) ? 'MINIMIZE (KEEP LOCK)' : 'CLOSE'}
+                    <button onClick={onClose} style={{ marginTop: '10px', width: '100%', background: '#222', border: 'none', padding: '10px', color: '#555', cursor: 'pointer', fontSize: '0.8rem' }}>
+                        {(tile.status === 'CLAIMED' && isOwner) ? 'MINIMIZE' : 'CLOSE'}
                     </button>
                 </div>
             </div>

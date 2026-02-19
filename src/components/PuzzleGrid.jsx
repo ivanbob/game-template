@@ -90,9 +90,8 @@ const PuzzleGrid = ({ clues, onGridChange, initialGrid, isInteractive = true }) 
     const { rows, cols } = clues;
 
     return (
-        <div className="puzzle-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', selectUser: 'none', touchAction: 'none' }}>
-
-            {/* Mode Toggle */}
+        <div className="puzzle-game-container">
+            {/* Mode Toggle - Kept Same */}
             <div style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}>
                 <button
                     className={mode === CELL.FILLED ? 'btn-mode active' : 'btn-mode'}
@@ -110,62 +109,43 @@ const PuzzleGrid = ({ clues, onGridChange, initialGrid, isInteractive = true }) 
                 </button>
             </div>
 
-            {/* Grid Layout: 2x2 with Flex */}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Responsive Grid Structure */}
+            <div className="puzzle-game-board" style={{ width: '100%', maxWidth: '400px' }}>
 
-                {/* Top Row: Spacer + Col Clues */}
-                <div style={{ display: 'flex' }}>
-                    {/* Top-Left Spacer (Placeholder for Row Clues width) */}
-                    {/* We need to ensure this matches the width of the Left Column below. 
-                        Since Row Clues width is variable based on content, we can't easily sync without Grid or Fixed Width.
-                        Let's use a Fixed Width for Row Clues: e.g. 60px.
-                    */}
-                    <div style={{ width: '60px', flexShrink: 0 }}></div>
-
-                    {/* Col Clues */}
-                    <div style={{ display: 'flex', gap: '1px', marginBottom: '5px' }}>
+                {/* Top: Spacer + Col Clues */}
+                <div className="puzzle-row-container">
+                    <div className="clue-row-area" style={{ visibility: 'hidden' }}></div> {/* Spacer */}
+                    <div className="clue-col-area">
                         {cols.map((colClues, i) => (
-                            <div key={i} style={{ width: `${CELL_SIZE}px`, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', fontSize: '10px', color: '#888' }}>
+                            <div key={i} className="clue-col-item">
                                 {colClues.map((num, idx) => <div key={idx}>{num}</div>)}
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* Bottom Row: Row Clues + Grid */}
-                <div style={{ display: 'flex' }}>
-                    {/* Row Clues */}
-                    <div style={{ width: '60px', display: 'flex', flexDirection: 'column', gap: '1px', marginRight: '5px', alignItems: 'flex-end', flexShrink: 0 }}>
+                {/* Bottom: Row Clues + Grid */}
+                <div className="puzzle-row-container">
+                    <div className="clue-row-area">
                         {rows.map((rowClues, i) => (
-                            <div key={i} style={{ height: `${CELL_SIZE}px`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', fontSize: '10px', color: '#888', width: '100%' }}>
+                            <div key={i} className="clue-row-item">
                                 {rowClues.join(' ')}
                             </div>
                         ))}
                     </div>
 
-                    {/* The Grid */}
                     <div
-                        className="grid-board"
-                        style={{ display: 'grid', gridTemplateColumns: `repeat(${grid[0]?.length || 10}, ${CELL_SIZE}px)`, gap: '1px', background: '#444', border: '2px solid #666' }}
+                        className="grid-board-responsive"
+                        style={{ gridTemplateColumns: `repeat(${grid[0]?.length || 10}, 1fr)` }}
                         onPointerLeave={handlePointerUp}
                     >
                         {grid.map((row, r) => (
                             row.map((cellState, c) => (
                                 <div
                                     key={`${r}-${c}`}
+                                    className={`grid-cell-responsive ${cellState === CELL.FILLED ? 'filled' : ''}`}
                                     onPointerDown={(e) => handlePointerDown(r, c, e)}
                                     onPointerEnter={() => handlePointerEnter(r, c)}
-                                    style={{
-                                        width: `${CELL_SIZE}px`,
-                                        height: `${CELL_SIZE}px`,
-                                        backgroundColor: cellState === CELL.FILLED ? '#0f0' : '#222',
-                                        color: '#f00',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        fontSize: '16px'
-                                    }}
                                 >
                                     {cellState === CELL.MARKED && '×'}
                                 </div>

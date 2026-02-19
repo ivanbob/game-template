@@ -99,6 +99,21 @@ class GameStateManager {
         this.isSubmitting = false;
         this.lastError = null;
         this.isBootcampMode = false;
+        // UI Spec State Extensions
+        this.selectedTileId = null;
+        this.isSubmitting = false;
+        this.lastError = null;
+        this.isBootcampMode = false;
+        this.listeners = new Set();
+    }
+
+    subscribe(callback) {
+        this.listeners.add(callback);
+        return () => this.listeners.delete(callback);
+    }
+
+    notify() {
+        this.listeners.forEach(cb => cb(this.currentState, this));
     }
 
     /**
@@ -113,6 +128,7 @@ class GameStateManager {
         this.currentUser = userContext;
         this.isBootcampMode = false; // Reset by default
         console.log('[GameState] Initialized with user:', userContext.id);
+        this.notify();
     }
 
     /**
@@ -132,6 +148,8 @@ class GameStateManager {
         // If we have active data and are in LOBBY, move to ACTIVE
         if (this.vault.tiles.size > 0 && this.currentState === GAME_STATES.LOBBY) {
             this.transitionTo(GAME_STATES.VAULT_ACTIVE);
+        } else {
+            this.notify(); // Notify even if state didn't change, as data did
         }
     }
 
@@ -142,7 +160,7 @@ class GameStateManager {
     transitionTo(newState) {
         console.log(`[GameState] Transition: ${this.currentState} -> ${newState}`);
         this.currentState = newState;
-        // TODO: Emit event to UI listeners
+        this.notify();
     }
 
     getCurrentState() {

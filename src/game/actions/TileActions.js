@@ -280,10 +280,22 @@ export async function fetchVault() {
 export async function fetchLeaderboard() {
     // API_BASE already includes /api/game/vault
     // we need /api/game/vault/leaderboard
-    const res = await callApi('/leaderboard', 'GET');
-    if (res.success && Array.isArray(res.data)) {
+    const res = await callApi(`/leaderboard?t=${Date.now()}`, 'GET');
+
+    if (!res.success) {
+        throw new Error(res.error || 'Failed to fetch leaderboard');
+    }
+
+    // Unpack double-wrapped response: callApi.data -> serverResponse.data
+    if (res.data && res.data.success && Array.isArray(res.data.data)) {
+        return res.data.data;
+    }
+
+    // Fallback if structure is different
+    if (Array.isArray(res.data)) {
         return res.data;
     }
+
     console.warn('[TileActions] Leaderboard return was not an array:', res.data);
     return [];
 }

@@ -62,6 +62,20 @@ const CipherGame = () => {
 
         // Force initial render
         setCurrentState(gameState.getCurrentState());
+
+        // 2. Subscribe to State Changes (Observer Pattern)
+        const unsubscribe = gameState.subscribe((newState, stateInstance) => {
+            setCurrentState(newState);
+            // Instant Selection Sync
+            if (stateInstance.selectedTileId) {
+                const t = stateInstance.vault.getTile(stateInstance.selectedTileId);
+                setSelectedTile(t ? { ...t } : null);
+            } else {
+                setSelectedTile(null);
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     // 2. Game Loop Effect
@@ -153,7 +167,7 @@ const CipherGame = () => {
             )}
 
             <footer style={{ marginTop: '40px', fontSize: '0.7rem', color: '#444' }}>
-                v1.1.1
+                v1.1.7
             </footer>
         </div>
     );

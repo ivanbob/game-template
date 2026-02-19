@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { gameState } from '../game/state/GameState';
 import Leaderboard from '../game/Leaderboard';
 import { claimTile, solveTile } from '../game/actions/TileActions';
+import { TILE_STATUS } from '../game/constants';
+
 const GameControls = ({ onFeedback }) => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -31,8 +33,16 @@ const GameControls = ({ onFeedback }) => {
     const handleAutoSolve = async () => {
         if (!confirm('🪄 MAGIC: Auto-Solving all remaining tiles...')) return;
 
-        const openTiles = gameState.vault.grid.filter(t => t.status === TILE_STATUS.OPEN);
+        // FIX BUG-027: Use getTiles() iterator instead of undefined .grid property
+        const allTiles = Array.from(gameState.vault.getTiles());
+        const openTiles = allTiles.filter(t => t.status === TILE_STATUS.OPEN);
+
         console.log(`[AutoSolve] Found ${openTiles.length} open tiles.`);
+
+        if (openTiles.length === 0) {
+            alert('No open tiles found to solve!');
+            return;
+        }
 
         for (const tile of openTiles) {
             console.log(`[AutoSolve] Processing Tile ${tile.id}...`);
@@ -188,44 +198,78 @@ const GameControls = ({ onFeedback }) => {
         }
     };
 
+    // --- AUTHORIZATION CHECK ---
+    // Rule: Visible ONLY if:
+    // 1. User is Admin (ID: 69069618)
+    // 2. OR Environment is Localhost/DevFrame (dev_user_local)
+    // 3. OR Environment is Pure Web (not Telegram)
+    // TESTED: ID 509656145 should be BLOCKED in Telegram.
+    // --- AUTHORIZATION CHECK ---
+    const isAuthorized = () => {
+        const user = gameState.currentUser;
+        const userId = user ? String(user.id) : 'guest';
+        const ALLOWED_IDS = ['69069618', 'dev_user_local'];
+
+        // 1. Admins determine their own fate
+        if (ALLOWED_IDS.includes(userId)) return true;
+
+        // 2. Allow Localhost and Staging (cipher-squad-web)
+        // Production (cipher-squad-ui) is NOT in this list, so it will return false.
+        const hostname = window.location.hostname;
+        if (hostname.includes('localhost') || hostname.includes('cipher-squad-web')) {
+            return true;
+        }
+
+        return false;
+    };
+
     return (
         <div style={{ border: '1px dashed red', padding: '10px', background: '#000', color: '#fff', marginBottom: '10px' }}>
             <h4 style={{ marginTop: 0 }}>Debug Controls (Dev Only)</h4>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                {!gameState.isBootcampMode && (
-                    <>
-                        <button onClick={handleReseed} style={{ cursor: 'pointer', background: '#440000', color: '#f00', border: '1px solid #f00', padding: '5px' }}>
-                            ⚠️ RESEED DAILY VAULT
+
+            {isAuthorized() && (
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    {!gameState.isBootcampMode && (
+                        <>
+                            <button onClick={handleReseed} style={{ cursor: 'pointer', background: '#440000', color: '#f00', border: '1px solid #f00', padding: '5px' }}>
+                                ⚠️ RESEED DAILY VAULT
+                            </button>
+                            <button onClick={handleAutoSolve} style={{ cursor: 'pointer', background: '#330044', color: '#d0f', border: '1px solid #d0f', padding: '5px' }}>
+                                🪄 AUTO SOLVE VAULT
+                            </button>
+                        </>
+                    )}
+                    <button onClick={() => window.location.reload()} style={{ cursor: 'pointer', background: '#333', color: '#fff', padding: '5px' }}>
+                        ↻ RELOAD APP
+                    </button>
+                    <button onClick={() => {
+                        if (confirm('Reset to BOOTCAMP? This will clear local storage.')) {
+                            localStorage.clear();
+                            window.location.reload();
+                        }
+                    }} style={{ cursor: 'pointer', background: '#444400', color: '#ff0', border: '1px solid #ff0', padding: '5px' }}>
+                        👶 RESET TO BOOTCAMP
+                    </button>
+                    {gameState.isBootcampMode && (
+                        <button onClick={() => {
+                            if (confirm('Skip Bootcamp and go to Daily Vault?')) {
+                                localStorage.setItem('bootcamp_complete', 'true');
+                                window.location.reload();
+                            }
+                        }} style={{ cursor: 'pointer', background: '#004444', color: '#0ff', border: '1px solid #0ff', padding: '5px' }}>
+                            🎓 SKIP BOOTCAMP
                         </button>
-                        <button onClick={handleAutoSolve} style={{ cursor: 'pointer', background: '#330044', color: '#d0f', border: '1px solid #d0f', padding: '5px' }}>
-                            🪄 AUTO SOLVE VAULT
-                        </button>
-                    </>
-                )}
-                <button onClick={() => window.location.reload()} style={{ cursor: 'pointer', background: '#333', color: '#fff', padding: '5px' }}>
-                    ↻ RELOAD APP
-                </button>
-                <button onClick={() => {
-                    if (confirm('Reset to BOOTCAMP? This will clear local storage.')) {
-                        localStorage.clear();
-                        window.location.reload();
-                    }
-                }} style={{ cursor: 'pointer', background: '#444400', color: '#ff0', border: '1px solid #ff0', padding: '5px' }}>
-                    👶 RESET TO BOOTCAMP
-                </button>
-                <button onClick={handleShowMaster} style={{ cursor: 'pointer', background: '#004400', color: '#0f0', border: '1px solid #0f0', padding: '5px' }}>
-                    👁 SHOW MASTER IMAGE
-                </button>
-                <button onClick={() => setShowLeaderboard(true)} style={{ cursor: 'pointer', background: '#442200', color: '#fa0', border: '1px solid #fa0', padding: '5px' }}>
-                    🏆 LEADERBOARD
-                </button>
-            </div>
-            {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
-            {!gameState.isBootcampMode && (
-                <div style={{ fontSize: '10px', color: '#666', marginTop: '5px' }}>
-                    *Reseed will generate new 15x15 Space Invader Pattern.
+                    )}
+                    <button onClick={handleShowMaster} style={{ cursor: 'pointer', background: '#004400', color: '#0f0', border: '1px solid #0f0', padding: '5px' }}>
+                        👁 SHOW MASTER IMAGE
+                    </button>
+                    <button onClick={() => setShowLeaderboard(true)} style={{ cursor: 'pointer', background: '#442200', color: '#fa0', border: '1px solid #fa0', padding: '5px' }}>
+                        🏆 LEADERBOARD
+                    </button>
                 </div>
             )}
+
+            {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
         </div>
     );
 };

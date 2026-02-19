@@ -7,11 +7,11 @@
         "studio_native": true
     },
     "lifecycle": {
-        "current_phase": "BUILD",
-        "active_objective": "Build: Debug Auto-Solve Feature",
-        "last_transition": "2026-02-17T20:20:00+02:00",
-        "progress": 20,
-        "notes": "Features under development. Architecture Map integration."
+        "current_phase": "QA",
+        "active_objective": "QA: Verify Debug Auto-Solve & Bug Fixes",
+        "last_transition": "2026-02-17T21:30:00+02:00",
+        "progress": 100,
+        "notes": "Debug Auto-Solve implemented. Critical bugs (027-031) fixed. Deployed to QA."
     },
     "gdd": {
         "status": "PARSED",
@@ -40,6 +40,27 @@
         "last_run": null,
         "verdict": "UNKNOWN",
         "notes": null
+    },
+    "phase": "MAINTENANCE",
+    "status": "LIVE",
+    "objective": "Resolve Bug Reports & Optimize Mobile UX",
+    "environments": {
+        "production": {
+            "url": "https://cipher-squad-ui.pages.dev/",
+            "description": "Live Telegram Bot Environment. STRICT Auth (Admin Only).",
+            "bot_username": "ciphersquad_bot"
+        },
+        "staging": {
+            "url": "https://cipher-squad-web.pages.dev/",
+            "description": "Browser / Web Testing. Allows Debug Controls for testing.",
+            "note": "Used for 'Web Version' testing outside Telegram."
+        }
+    },
+    "current_sprint": {
+        "status": null,
+        "type": null,
+        "notes": null,
+        "completed_at": null
     },
     "release": {
         "status": "NONE",
@@ -287,9 +308,71 @@
             "priority": "HIGH",
             "created_at": "2026-02-17T17:25:00+02:00",
             "resolved_at": "2026-02-17T17:35:00+02:00"
+        },
+        {
+            "id": "BUG-027",
+            "title": "Auto-Solve Crash (undefined grid)",
+            "description": "Clicking 'Auto Solve' crashes with TypeError reading 'filter'. Fixed by accessing gameState.vault.getTiles() instead of invalid .grid property.",
+            "status": "RESOLVED",
+            "priority": "MEDIUM",
+            "created_at": "2026-02-17T20:25:00+02:00",
+            "resolved_at": "2026-02-17T20:30:00+02:00"
+        },
+        {
+            "id": "BUG-028",
+            "title": "Auto-Solve Crash (TILE_STATUS not defined)",
+            "description": "ReferenceError: TILE_STATUS is not defined. Fixed by restoring import statement in GameControls.jsx.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T20:35:00+02:00",
+            "resolved_at": "2026-02-17T20:40:00+02:00"
+        },
+        {
+            "id": "BUG-029",
+            "title": "Tile Lock Soft-Lock (Puzzle doesn't open)",
+            "description": "Fixed by implementing Observer pattern in GameState to ensure reactive UI updates when selecting tiles. Added cursor:pointer to owned locks.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T20:50:00+02:00",
+            "resolved_at": "2026-02-17T21:05:00+02:00"
+        },
+        {
+            "id": "BUG-030",
+            "title": "Telegram WebApp Stale Version",
+            "description": "Bumped version to v1.1.2 to force visual differentiation and encourage cache invalidation.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T20:55:00+02:00",
+            "resolved_at": "2026-02-17T21:00:00+02:00"
+        },
+        {
+            "id": "BUG-031",
+            "title": "Telegram Bot Environment Mismatch",
+            "description": "Bot was configured for 'qa' branch of 'cipher-squad-web'. Deployed v1.1.2 to 'qa' branch to resolve.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T21:00:00+02:00",
+            "resolved_at": "2026-02-17T21:25:00+02:00"
+        },
+        {
+            "id": "BUG-032",
+            "title": "Nonogram Mobile Usability (Too Small)",
+            "description": "Adjusted PuzzleGrid to use CSS Variables. Added responsive media query for mobile (32px cells, full width modal).",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-17T21:30:00+02:00",
+            "resolved_at": "2026-02-17T21:40:00+02:00"
+        },
+        {
+            "id": "BUG-033",
+            "title": "Debug Controls Visible to All",
+            "description": "Restricted debug controls to Admin (69069618) or Non-Telegram environments.",
+            "status": "RESOLVED",
+            "priority": "HIGH",
+            "created_at": "2026-02-19T14:55:00+02:00",
+            "resolved_at": "2026-02-19T15:05:00+02:00"
         }
     ],
-    "warnings": [],
     "history": [
         {
             "phase": "RELEASE",
