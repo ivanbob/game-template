@@ -8,10 +8,10 @@
     },
     "lifecycle": {
         "current_phase": "RELEASE",
-        "active_objective": "RELEASE: V1.2.0 Global Vault Launch",
-        "last_transition": "2026-02-19T21:50:00+02:00",
-        "progress": 100,
-        "notes": "Global Vault V1 released. Bootcamp skip enabled. Leaderboard active."
+        "active_objective": "RELEASE: V2.0.0 (Squads Release) - Finalization",
+        "last_transition": "2026-02-24T23:20:00+02:00",
+        "progress": 0,
+        "notes": "QA Approved by human. Transitioned to RELEASE phase via QA_PASS."
     },
     "gdd": {
         "status": "PARSED",
@@ -22,28 +22,28 @@
     },
     "spec": {
         "status": "APPROVED",
-        "spec_id": "IMP_PLAN_V2",
-        "version": "2.0",
+        "spec_id": "MEC-005",
+        "version": "2.0-rc1",
         "approved": true,
-        "last_updated": "2026-02-06T23:40:00+02:00"
+        "last_updated": "2026-02-24T23:17:00+02:00"
     },
     "build": {
-        "status": "RELEASED",
-        "version": "1.2.0",
-        "build_id": "r_v1.2.0_global",
+        "status": "SUCCESS",
+        "version": "2.0.0-alpha",
+        "build_id": "b_v2.0.0_init",
         "commit": "HEAD",
-        "started_at": "2026-02-16T18:09:19+02:00",
-        "completed_at": "2026-02-19T21:50:00+02:00"
+        "started_at": "2026-02-24T22:55:00+02:00",
+        "completed_at": "2026-02-24T23:07:08+02:00"
     },
     "qa": {
-        "status": "PASSED",
-        "last_run": "2026-02-19T21:30:00+02:00",
+        "status": "PASS",
+        "last_run": "2026-02-24T23:18:00+02:00",
         "verdict": "PASS",
-        "notes": "Verified by User (Leaderboard, Bootcamp, Vault)."
+        "notes": "QA Feel Audit passed against new UI Logic Spec."
     },
-    "phase": "LIVE_OPS",
-    "status": "LIVE",
-    "objective": "Monitor V1 Launch & Gather Metrics",
+    "phase": "DEVELOPMENT",
+    "status": "ACTIVE",
+    "objective": "Architect V2 Squad System",
     "environments": {
         "production": {
             "url": "https://cipher-squad-ui.pages.dev/",

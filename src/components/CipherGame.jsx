@@ -8,6 +8,7 @@ import GameControls from './GameControls';
 import { fetchVault } from '../game/actions/TileActions';
 
 import TileDetailsModal from './TileDetailsModal';
+import SquadLobby from './SquadLobby';
 import '../styles/cipher.css';
 
 /**
@@ -23,6 +24,7 @@ const CipherGame = () => {
     const [feedback, setFeedback] = useState('');
     const [selectedTile, setSelectedTile] = useState(null);
     const [isMinimized, setIsMinimized] = useState(false);
+    const [viewMode, setViewMode] = useState('GAME'); // 'GAME' or 'LOBBY'
 
     // 1. Initialize Game on Mount
     useEffect(() => {
@@ -124,7 +126,15 @@ const CipherGame = () => {
     return (
         <div className="cipher-container">
             <header className="game-header">
-                <h1>Cipher Squad</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1>Cipher Squad</h1>
+                    <button className="outline-btn" style={{ padding: '4px 8px', fontSize: '0.8rem' }} onClick={() => setViewMode(viewMode === 'GAME' ? 'LOBBY' : 'GAME')}>
+                        {viewMode === 'GAME' ? 'Squads' : 'Back to Game'}
+                    </button>
+                </div>
+                {viewMode === 'GAME' && <div className="squad-indicator" style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '4px' }}>
+                    Squad: {gameState.currentSquadName || 'Global'}
+                </div>}
             </header>
 
             <div className="status-panel">
@@ -133,19 +143,31 @@ const CipherGame = () => {
                 <div className="msg-area">{feedback}</div>
             </div>
 
-            {showDebug && <GameControls onFeedback={handleFeedback} />}
-
-            {(gameState.isBootcampMode) ? (
-                <BootcampVault
-                    onFeedback={handleFeedback}
-                    onComplete={() => {
-                        // Handle Graduation
-                        localStorage.setItem('bootcamp_complete', 'true');
-                        window.location.reload();
-                    }}
-                />
+            {viewMode === 'LOBBY' ? (
+                <SquadLobby onSelectSquad={(id, name) => {
+                    gameState.setSquad(id, name);
+                    setViewMode('GAME');
+                    // Refresh Vault
+                    fetchVault().then((res) => {
+                        if (!res || !res.success) setFeedback('FAILED TO LOAD SQUAD VAULT');
+                    });
+                }} />
             ) : (
-                <VaultGrid onFeedback={handleFeedback} />
+                <>
+                    {showDebug && <GameControls onFeedback={handleFeedback} />}
+
+                    {(gameState.isBootcampMode) ? (
+                        <BootcampVault
+                            onFeedback={handleFeedback}
+                            onComplete={() => {
+                                localStorage.setItem('bootcamp_complete', 'true');
+                                window.location.reload();
+                            }}
+                        />
+                    ) : (
+                        <VaultGrid onFeedback={handleFeedback} />
+                    )}
+                </>
             )}
 
             {/* Modal Layer */}

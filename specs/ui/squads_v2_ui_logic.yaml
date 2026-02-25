@@ -1,0 +1,77 @@
+screen_id: "squad_lobby_v2"
+states:
+  - id: "LOBBY_MAIN"
+    description: "Main lobby view showing list of user's squads and options to Create or Join."
+  - id: "CREATE_SQUAD_FORM"
+    description: "Input form to create a new squad with a custom name."
+  - id: "JOIN_SQUAD_FORM"
+    description: "Input form to paste an invite code to join a squad."
+  - id: "CREATE_SUBMITTING"
+    description: "Async transaction state while squad is being created."
+  - id: "JOIN_SUBMITTING"
+    description: "Async transaction state while joining a squad."
+  - id: "ERROR_FEEDBACK"
+    description: "Transient error feedback for join/create failures."
+  - id: "GAME_ACTIVE"
+    description: "The main game view, showing the Vault grid for the selected Squad."
+
+interactions:
+  - id: "INT_CLICK_CREATE_SQUAD"
+    trigger: "User taps 'Create Squad' tab/button."
+    from_state: "LOBBY_MAIN"
+    to_state: "CREATE_SQUAD_FORM"
+
+  - id: "INT_CLICK_JOIN_SQUAD"
+    trigger: "User taps 'Join Squad' tab/button."
+    from_state: "LOBBY_MAIN"
+    to_state: "JOIN_SQUAD_FORM"
+
+  - id: "INT_CANCEL_CREATE_JOIN"
+    trigger: "User taps 'Back' or 'Close'."
+    from_state: "CREATE_SQUAD_FORM"
+    to_state: "LOBBY_MAIN"
+
+  - id: "INT_SUBMIT_CREATE"
+    trigger: "User submits new squad name."
+    from_state: "CREATE_SQUAD_FORM"
+    to_state: "CREATE_SUBMITTING"
+
+  - id: "INT_SUBMIT_JOIN"
+    trigger: "User submits invite code."
+    from_state: "JOIN_SQUAD_FORM"
+    to_state: "JOIN_SUBMITTING"
+
+  - id: "INT_ACTION_SUCCESS_CREATE"
+    trigger: "Server returns 200 OK and new squad info."
+    from_state: "CREATE_SUBMITTING"
+    to_state: "GAME_ACTIVE"
+
+  - id: "INT_ACTION_SUCCESS_JOIN"
+    trigger: "Server returns 200 OK after joining squad."
+    from_state: "JOIN_SUBMITTING"
+    to_state: "GAME_ACTIVE"
+
+  - id: "INT_SELECT_SQUAD_FROM_LIST"
+    trigger: "User taps an existing squad from the roster."
+    from_state: "LOBBY_MAIN"
+    to_state: "GAME_ACTIVE"
+
+  - id: "INT_ACTION_FAIL"
+    trigger: "Server returns error (e.g. invalid code, duplicate name)."
+    from_state: "CREATE_SUBMITTING"
+    to_state: "ERROR_FEEDBACK"
+
+  - id: "INT_ACTION_FAIL_JOIN"
+    trigger: "Server returns error."
+    from_state: "JOIN_SUBMITTING"
+    to_state: "ERROR_FEEDBACK"
+
+  - id: "INT_DISMISS_ERROR"
+    trigger: "User dismisses error or timeout occurs."
+    from_state: "ERROR_FEEDBACK"
+    to_state: "LOBBY_MAIN"
+
+constraints:
+  max_simultaneous_actions: 1
+  disable_on_error: false
+  time_pressure: false

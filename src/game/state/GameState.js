@@ -94,6 +94,9 @@ class GameStateManager {
         this.vault = new VaultStore();
         this.currentUser = null;
 
+        this.currentSquadId = localStorage.getItem('cipher_squad_id') || 'global-squad-0000';
+        this.currentSquadName = localStorage.getItem('cipher_squad_name') || 'Global Squad';
+
         // UI Spec State Extensions
         this.selectedTileId = null;
         this.isSubmitting = false;

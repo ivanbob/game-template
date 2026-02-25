@@ -5,11 +5,14 @@ const Leaderboard = ({ onClose }) => {
     const [scores, setScores] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [tab, setTab] = useState('SQUAD'); // 'SQUAD' or 'GLOBAL'
 
     useEffect(() => {
         const load = async () => {
+            setLoading(true);
+            setError(null);
             try {
-                const data = await fetchLeaderboard();
+                const data = await fetchLeaderboard(tab === 'GLOBAL');
                 setScores(data);
             } catch (err) {
                 console.error(err);
@@ -20,7 +23,7 @@ const Leaderboard = ({ onClose }) => {
         };
 
         load();
-    }, []);
+    }, [tab]);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -34,6 +37,22 @@ const Leaderboard = ({ onClose }) => {
                         className="text-slate-400 hover:text-white transition-colors"
                     >
                         ✕
+                    </button>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex bg-slate-800 border-b border-slate-700">
+                    <button
+                        className={`flex-1 py-2 text-sm font-bold tracking-wider ${tab === 'SQUAD' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-slate-700' : 'text-slate-400 hover:text-white'}`}
+                        onClick={() => setTab('SQUAD')}
+                    >
+                        SQUAD
+                    </button>
+                    <button
+                        className={`flex-1 py-2 text-sm font-bold tracking-wider ${tab === 'GLOBAL' ? 'text-cyan-400 border-b-2 border-cyan-400 bg-slate-700' : 'text-slate-400 hover:text-white'}`}
+                        onClick={() => setTab('GLOBAL')}
+                    >
+                        GLOBAL
                     </button>
                 </div>
 

@@ -23,7 +23,7 @@ function response(success, error = null, data = null) {
 /**
  * Helper to call Backend
  */
-async function callApi(endpoint, method, body) {
+async function callApi(endpoint, method, body, overrideHeaders = {}) {
     if (!USE_REMOTE_API) return { success: true };
 
     // Safe Telegram Auth Extraction
@@ -43,7 +43,9 @@ async function callApi(endpoint, method, body) {
             method,
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': authHeader
+                'Authorization': authHeader,
+                'X-Squad-Id': gameState.currentSquadId || 'global-squad-0000',
+                ...overrideHeaders
             },
             body: JSON.stringify(body)
         });
@@ -277,10 +279,11 @@ export async function fetchVault() {
  * Fetches the Leaderboard (Top 50)
  * @returns {Promise<Array>}
  */
-export async function fetchLeaderboard() {
+export async function fetchLeaderboard(isGlobal = false) {
     // API_BASE already includes /api/game/vault
     // we need /api/game/vault/leaderboard
-    const res = await callApi(`/leaderboard?t=${Date.now()}`, 'GET');
+    const overrideHeaders = isGlobal ? { 'X-Squad-Id': 'global-squad-0000' } : {};
+    const res = await callApi(`/leaderboard?t=${Date.now()}`, 'GET', null, overrideHeaders);
 
     if (!res.success) {
         throw new Error(res.error || 'Failed to fetch leaderboard');
