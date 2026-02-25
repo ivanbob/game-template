@@ -259,7 +259,7 @@ async function handleGameRequest(request: Request, env: any): Promise<Response> 
             const body: any = await request.json();
             if (!body.squadId) return new Response('Missing squadId', { status: 400 });
             const result = await squadRepo.joinSquad(userId, body.squadId);
-            if (!result) return new Response('Squad not found', { status: 404 });
+            if (!result) return new Response('Squad not found or invalid invite code', { status: 400 });
             return Response.json({ success: true, data: result });
         }
 

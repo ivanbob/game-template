@@ -9,6 +9,15 @@ const SquadLobby = ({ onSelectSquad }) => {
     const [joinCode, setJoinCode] = useState('');
     const [error, setError] = useState('');
 
+    const changeView = (v) => {
+        setError('');
+        setSquadName('');
+        setJoinCode('');
+        setView(v);
+    };
+
+    const WORKER_BASE = 'https://cipher-squad-worker.jikoentcompany.workers.dev';
+
     useEffect(() => {
         fetchSquads();
     }, []);
@@ -17,7 +26,7 @@ const SquadLobby = ({ onSelectSquad }) => {
         setLoading(true);
         try {
             // Check if global squad logic should be used here, but for now we expect API to return squads
-            const res = await fetch('/api/squad/info', {
+            const res = await fetch(`${WORKER_BASE}/api/squad/info`, {
                 headers: getAuthHeaders()
             });
             if (res.ok) {
@@ -46,7 +55,7 @@ const SquadLobby = ({ onSelectSquad }) => {
         setError('');
         setLoading(true);
         try {
-            const res = await fetch('/api/squad/create', {
+            const res = await fetch(`${WORKER_BASE}/api/squad/create`, {
                 method: 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify({ name: squadName })
@@ -69,7 +78,7 @@ const SquadLobby = ({ onSelectSquad }) => {
         setError('');
         setLoading(true);
         try {
-            const res = await fetch('/api/squad/join', {
+            const res = await fetch(`${WORKER_BASE}/api/squad/join`, {
                 method: 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify({ squadId: joinCode })
@@ -98,7 +107,7 @@ const SquadLobby = ({ onSelectSquad }) => {
                         {squads.map(sq => (
                             <li key={sq.id} onClick={() => onSelectSquad(sq.id, sq.name)}>
                                 <span className="squad-name">{sq.name}</span>
-                                <span className="squad-role">{sq.role}</span>
+                                <span className="squad-role" style={{ color: '#888', fontSize: '0.8rem', marginLeft: '8px' }}>({sq.role})</span>
                             </li>
                         ))}
                     </ul>
@@ -106,8 +115,8 @@ const SquadLobby = ({ onSelectSquad }) => {
             )}
 
             <div className="lobby-actions">
-                <button className="primary-btn" onClick={() => setView('create')}>Create Squad</button>
-                <button className="secondary-btn" onClick={() => setView('join')}>Join via Code</button>
+                <button className="primary-btn" onClick={() => changeView('create')}>Create Squad</button>
+                <button className="secondary-btn" onClick={() => changeView('join')}>Join via Code</button>
             </div>
 
             <div className="global-fallback">
@@ -118,7 +127,7 @@ const SquadLobby = ({ onSelectSquad }) => {
     );
 
     const renderCreate = () => (
-        <div className="squad-form">
+        <form className="squad-form" onSubmit={(e) => { e.preventDefault(); handleCreate(); }}>
             <h3>Create a New Squad</h3>
             <p>Form a private squad to solve vaults with your friends.</p>
             <input
@@ -130,14 +139,14 @@ const SquadLobby = ({ onSelectSquad }) => {
             />
             {error && <p className="error-text">{error}</p>}
             <div className="lobby-actions">
-                <button className="primary-btn" onClick={handleCreate} disabled={loading}>Create</button>
-                <button className="secondary-btn" onClick={() => setView('list')} disabled={loading}>Cancel</button>
+                <button type="submit" className="primary-btn" disabled={loading}>Create</button>
+                <button type="button" className="secondary-btn" onClick={() => changeView('list')} disabled={loading}>Cancel</button>
             </div>
-        </div>
+        </form>
     );
 
     const renderJoin = () => (
-        <div className="squad-form">
+        <form className="squad-form" onSubmit={(e) => { e.preventDefault(); handleJoin(); }}>
             <h3>Join a Squad</h3>
             <p>Enter the invite code from your squad leader.</p>
             <input
@@ -148,10 +157,10 @@ const SquadLobby = ({ onSelectSquad }) => {
             />
             {error && <p className="error-text">{error}</p>}
             <div className="lobby-actions">
-                <button className="primary-btn" onClick={handleJoin} disabled={loading}>Join</button>
-                <button className="secondary-btn" onClick={() => setView('list')} disabled={loading}>Cancel</button>
+                <button type="submit" className="primary-btn" disabled={loading}>Join</button>
+                <button type="button" className="secondary-btn" onClick={() => changeView('list')} disabled={loading}>Cancel</button>
             </div>
-        </div>
+        </form>
     );
 
     return (

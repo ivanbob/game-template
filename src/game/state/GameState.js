@@ -135,6 +135,20 @@ class GameStateManager {
     }
 
     /**
+     * Updates the current active squad context.
+     * @param {string} squadId 
+     * @param {string} squadName 
+     */
+    setSquad(squadId, squadName) {
+        this.currentSquadId = squadId;
+        this.currentSquadName = squadName;
+        localStorage.setItem('cipher_squad_id', squadId);
+        localStorage.setItem('cipher_squad_name', squadName);
+        console.log(`[GameState] Switched to squad: ${squadName} (${squadId})`);
+        this.notify();
+    }
+
+    /**
      * Updates the local store with fresh vault data from server.
      * @param {Object} vaultData - JSON payload from BFF
      */

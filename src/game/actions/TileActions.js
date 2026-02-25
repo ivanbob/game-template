@@ -38,17 +38,21 @@ async function callApi(endpoint, method, body, overrideHeaders = {}) {
         authHeader = `mock dev_user_local`;
     }
 
+    const fetchOptions = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': authHeader,
+            'X-Squad-Id': gameState.currentSquadId || 'global-squad-0000',
+            ...overrideHeaders
+        }
+    };
+    if (method !== 'GET' && method !== 'HEAD' && body) {
+        fetchOptions.body = JSON.stringify(body);
+    }
+
     try {
-        const res = await fetch(`${API_BASE}${endpoint}`, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': authHeader,
-                'X-Squad-Id': gameState.currentSquadId || 'global-squad-0000',
-                ...overrideHeaders
-            },
-            body: JSON.stringify(body)
-        });
+        const res = await fetch(`${API_BASE}${endpoint}`, fetchOptions);
 
         if (!res.ok) {
             const text = await res.text();

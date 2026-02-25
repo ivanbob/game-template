@@ -63,17 +63,17 @@
         "completed_at": null
     },
     "release": {
-        "status": "NONE",
-        "version": null,
-        "build_id": null,
-        "type": null,
-        "notes": null,
-        "completed_at": null
+        "status": "APPROVED",
+        "version": "v2.0.0",
+        "build_id": "b_v2.0.0_rc1",
+        "type": "PUBLIC",
+        "notes": "Deployed V2 Squad Architecture fixes to staging and validated.",
+        "completed_at": "2026-02-25T15:20:00+02:00"
     },
     "approvals": {
         "spec": true,
-        "qa": false,
-        "release": false
+        "qa": true,
+        "release": true
     },
     "issues": [
         {
